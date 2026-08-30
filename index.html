@@ -1,62 +1,62 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Prasoon Music Player</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ff0055">
   <style>
-    /* --- CSS SECTION --- */
+    /* --- MOBILE-FIRST CSS SECTION --- */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-    body { background-color: #0f0f12; color: #ffffff; padding-bottom: 60px; }
-    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #18181f; border-bottom: 1px solid #282833; }
-    .logo { font-size: 20px; font-weight: 800; color: #ff0055; }
-    .auth-btn { background: #ff0055; color: #fff; border: none; padding: 8px 14px; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 13px; }
-    .user-profile { display: none; align-items: center; gap: 8px; }
-    .user-profile img { width: 32px; height: 32px; border-radius: 50%; }
+    body { background-color: #0f0f12; color: #ffffff; padding-bottom: 70px; }
     
-    .search-section { display: flex; padding: 15px 20px; gap: 10px; max-width: 600px; margin: auto; }
-    .search-section input { flex: 1; padding: 12px 16px; border-radius: 25px; border: 1px solid #333; background: #1c1c24; color: #fff; outline: none; }
-    .search-section button { padding: 12px 20px; background: #252533; color: #fff; border: none; border-radius: 25px; cursor: pointer; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: #18181f; border-bottom: 1px solid #282833; }
+    .logo { font-size: 1.2rem; font-weight: 800; color: #ff0055; }
+    .auth-btn { background: #ff0055; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    .user-profile { display: none; align-items: center; gap: 10px; }
+    .user-profile img { width: 35px; height: 35px; border-radius: 50%; }
     
-    /* फेवरेट सिंगर्स (Quick Tags) */
-    .fav-singers { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 10px; max-width: 600px; margin: auto; }
+    .search-section { display: flex; padding: 15px 5%; gap: 10px; width: 100%; max-width: 600px; margin: auto; }
+    .search-section input { flex: 1; padding: 12px 16px; border-radius: 25px; border: 1px solid #333; background: #1c1c24; color: #fff; outline: none; font-size: 14px; }
+    .search-section button { padding: 12px 20px; background: #252533; color: #fff; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; }
+    
+    .fav-singers { display: flex; gap: 10px; overflow-x: auto; padding: 0 5% 15px; width: 100%; max-width: 600px; margin: auto; scrollbar-width: none; }
     .fav-singers::-webkit-scrollbar { display: none; }
-    .singer-tag { padding: 6px 15px; background: #1c1c24; border-radius: 15px; font-size: 12px; white-space: nowrap; cursor: pointer; border: 1px solid #333; }
+    .singer-tag { padding: 8px 16px; background: #1c1c24; border-radius: 20px; font-size: 13px; white-space: nowrap; cursor: pointer; border: 1px solid #333; transition: 0.2s; }
     .singer-tag:hover { background: #ff0055; border-color: #ff0055; }
 
-    .player-container { max-width: 500px; margin: 10px auto; padding: 20px; background: #18181f; border-radius: 16px; text-align: center; border: 1px solid #282833; }
-    .mode-toggle { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; background: #121217; padding: 5px; border-radius: 20px; }
-    .mode-btn { background: transparent; color: #888; border: none; padding: 6px 16px; border-radius: 15px; cursor: pointer; font-weight: 600; font-size: 13px; }
+    .player-container { width: 90%; max-width: 500px; margin: 10px auto; padding: 20px; background: #18181f; border-radius: 20px; text-align: center; border: 1px solid #282833; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .mode-toggle { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; background: #121217; padding: 6px; border-radius: 25px; }
+    .mode-btn { flex: 1; background: transparent; color: #888; border: none; padding: 8px 0; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.3s; }
     .mode-btn.active { background: #ff0055; color: #fff; }
     
-    .screen-box { width: 100%; height: 260px; border-radius: 12px; overflow: hidden; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
+    .screen-box { width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
     #video-wrapper { width: 100%; height: 100%; display: none; }
     .audio-display { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
-    .rotating-disc { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; animation: spin 8s linear infinite; box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+    .rotating-disc { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; animation: spin 8s linear infinite; box-shadow: 0 0 25px rgba(255, 0, 85, 0.3); }
     @keyframes spin { 100% { transform: rotate(360deg); } }
     
-    .song-info { margin-top: 15px; }
-    .song-title { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .song-artist { font-size: 13px; color: #888; margin-top: 4px; }
+    .song-info { margin-top: 20px; }
+    .song-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
+    .song-artist { font-size: 0.9rem; color: #888; margin-top: 6px; }
     
-    /* Tabs: Search Results vs Favorites */
-    .tab-section { max-width: 600px; margin: 20px auto 10px; display: flex; justify-content: center; gap: 15px; }
-    .tab-btn { background: none; border: none; color: #888; font-size: 16px; font-weight: bold; cursor: pointer; padding-bottom: 5px; }
-    .tab-btn.active { color: #fff; border-bottom: 2px solid #ff0055; }
+    .tab-section { width: 90%; max-width: 600px; margin: 25px auto 15px; display: flex; justify-content: center; gap: 20px; border-bottom: 1px solid #282833; }
+    .tab-btn { background: none; border: none; color: #888; font-size: 15px; font-weight: bold; cursor: pointer; padding-bottom: 10px; transition: 0.2s; }
+    .tab-btn.active { color: #fff; border-bottom: 3px solid #ff0055; }
 
-    .results-section { max-width: 600px; margin: 0 auto; padding: 0 20px; }
-    .song-list { display: flex; flex-direction: column; gap: 10px; }
-    .song-card { display: flex; align-items: center; gap: 12px; background: #1c1c24; padding: 10px; border-radius: 10px; cursor: pointer; position: relative; }
-    .song-card img { width: 55px; height: 55px; border-radius: 6px; object-fit: cover; }
+    .results-section { width: 90%; max-width: 600px; margin: 0 auto; }
+    .song-list { display: flex; flex-direction: column; gap: 12px; }
+    .song-card { display: flex; align-items: center; gap: 15px; background: #1c1c24; padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+    .song-card:active { background: #252533; border-color: #ff0055; }
+    .song-card img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
     .song-meta { flex: 1; overflow: hidden; }
-    .song-meta h4 { font-size: 14px; margin-bottom: 3px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+    .song-meta h4 { font-size: 14px; margin-bottom: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
     .song-meta p { font-size: 12px; color: #888; }
-    .fav-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; color: #555; }
+    .fav-btn { background: none; border: none; font-size: 22px; cursor: pointer; padding: 5px; color: #555; }
     .fav-btn.loved { color: #ff0055; }
 
-    .install-banner { display: none; position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); background: #ff0055; color: #fff; padding: 10px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; z-index: 100; }
+    .install-banner { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ff0055; color: #fff; padding: 12px 25px; border-radius: 30px; font-weight: 700; cursor: pointer; z-index: 100; box-shadow: 0 5px 20px rgba(255,0,85,0.4); width: 80%; max-width: 300px; text-align: center; }
   </style>
 </head>
 <body>
@@ -74,15 +74,15 @@
   </header>
 
   <div class="search-section">
-    <input type="text" id="search-input" placeholder="गाना या आर्टिस्ट सर्च करें...">
-    <button id="search-btn">सर्च</button>
+    <input type="text" id="search-input" placeholder="Search songs or artists...">
+    <button id="search-btn">Search</button>
   </div>
 
   <div class="fav-singers">
     <div class="singer-tag" data-singer="Arijit Singh">Arijit Singh</div>
     <div class="singer-tag" data-singer="Shreya Ghoshal">Shreya Ghoshal</div>
     <div class="singer-tag" data-singer="Atif Aslam">Atif Aslam</div>
-    <div class="singer-tag" data-singer="Neha Kakkar">Neha Kakkar</div>
+    <div class="singer-tag" data-singer="The Weeknd">The Weeknd</div>
     <div class="singer-tag" data-singer="Jubin Nautiyal">Jubin Nautiyal</div>
     <div class="singer-tag" data-singer="Badshah">Badshah</div>
   </div>
@@ -103,19 +103,19 @@
     </div>
 
     <div class="song-info">
-      <div class="song-title" id="current-title">गाना सेलेक्ट करें</div>
-      <div class="song-artist" id="current-artist">MyBeat Music Engine</div>
+      <div class="song-title" id="current-title">Select a Song</div>
+      <div class="song-artist" id="current-artist">MyBeat Engine</div>
     </div>
   </div>
 
   <div class="tab-section">
-    <button class="tab-btn active" id="tab-search">सर्च रिजल्ट्स</button>
-    <button class="tab-btn" id="tab-fav">मेरे फेवरेट गानें ❤️</button>
+    <button class="tab-btn active" id="tab-search">Search Results</button>
+    <button class="tab-btn" id="tab-fav">Favorites ❤️</button>
   </div>
 
   <div class="results-section">
     <div class="song-list" id="results-list">
-      <p style="color: #666; font-size: 13px; text-align: center; margin-top: 10px;">गाना सर्च करें या अपने फेवरेट सिंगर्स पर क्लिक करें।</p>
+      <p style="color: #666; font-size: 14px; text-align: center; margin-top: 15px;">Search for a song to begin.</p>
     </div>
   </div>
 
@@ -128,7 +128,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
-    // Firebase Config (Your credentials)
+    // Firebase Config 
     const firebaseConfig = {
       apiKey: "AIzaSyDwiKbKcpckYDsZfT35E8LvVmhRbrOIczQ",
       authDomain: "prasoon-song.firebaseapp.com",
@@ -200,7 +200,7 @@
       videoWrapper.style.display = "block"; audioWrapper.style.display = "none";
     });
 
-    // Search Logic (Free Invidious API)
+    // Fast Search Logic using Piped API
     searchBtn.addEventListener("click", () => performSearch(searchInput.value));
     searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") performSearch(searchInput.value); });
     
@@ -208,41 +208,49 @@
       tag.addEventListener("click", () => {
         searchInput.value = tag.getAttribute("data-singer");
         performSearch(searchInput.value);
-        tabSearch.click(); // Switch to search tab
+        tabSearch.click();
       });
     });
 
     async function performSearch(query) {
       if (!query.trim()) return;
-      resultsList.innerHTML = "<p style='text-align:center; color:#bbb;'>सर्च किया जा रहा है...</p>";
+      resultsList.innerHTML = "<p style='text-align:center; color:#bbb;'>Searching...</p>";
       try {
-        const res = await fetch(`https://inv.tux.pizza/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
+        // Switched to faster, stable Piped API
+        const res = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=videos`);
         const data = await res.json();
-        renderList(data.slice(0, 10)); // Top 10 results
-      } catch (err) {
-        // Fallback API
-        try {
-          const res2 = await fetch(`https://invidious.nerdvpn.de/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
-          const data2 = await res2.json();
-          renderList(data2.slice(0, 10));
-        } catch(e) {
-          resultsList.innerHTML = "<p style='color:red;'>डेटा लोड नहीं हो पाया।</p>";
+        
+        if (!data.items || data.items.length === 0) {
+          resultsList.innerHTML = "<p style='text-align:center; color:#888;'>No songs found.</p>";
+          return;
         }
+        renderList(data.items.slice(0, 10), false, true); 
+      } catch (err) {
+        resultsList.innerHTML = "<p style='color:red; text-align:center;'>Data failed to load. Please try again.</p>";
       }
     }
 
     // Render Songs
-    function renderList(items, isFavList = false) {
+    function renderList(items, isFavList = false, isPipedData = false) {
       resultsList.innerHTML = "";
       if(items.length === 0) {
-        resultsList.innerHTML = "<p style='color:#888; text-align:center;'>लिस्ट खाली है।</p>"; return;
+        resultsList.innerHTML = "<p style='color:#888; text-align:center;'>List is empty.</p>"; return;
       }
       
       items.forEach((item) => {
-        const videoId = item.videoId;
-        const title = item.title;
-        const author = item.author;
-        const thumb = item.videoThumbnails ? item.videoThumbnails[0].url : (item.thumb || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`);
+        let videoId, title, author, thumb;
+
+        if (isPipedData) {
+          videoId = item.url.split('?v=')[1];
+          title = item.title;
+          author = item.uploaderName;
+          thumb = item.thumbnail;
+        } else {
+          videoId = item.videoId;
+          title = item.title;
+          author = item.author;
+          thumb = item.thumb;
+        }
         
         const isFav = favorites.some(fav => fav.videoId === videoId);
 
@@ -257,16 +265,14 @@
           <button class="fav-btn ${isFav ? 'loved' : ''}">${isFav ? '❤️' : '🤍'}</button>
         `;
 
-        // Play Song (Click anywhere on card except fav button)
         card.querySelector('.song-meta').addEventListener("click", () => playSong(videoId, title, author, thumb));
         card.querySelector('img').addEventListener("click", () => playSong(videoId, title, author, thumb));
 
-        // Favorite Logic
         const favBtn = card.querySelector('.fav-btn');
         favBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           toggleFavorite(videoId, title, author, thumb, favBtn);
-          if (isFavList) renderFavorites(); // Refresh fav list instantly
+          if (isFavList) renderFavorites(); 
         });
 
         resultsList.appendChild(card);
@@ -278,7 +284,7 @@
       if (ytPlayer && ytPlayer.loadVideoById) { ytPlayer.loadVideoById(videoId); ytPlayer.playVideo(); }
     }
 
-    // Favorites System Logic
+    // Favorites Logic
     function toggleFavorite(videoId, title, author, thumb, btnElement) {
       const index = favorites.findIndex(fav => fav.videoId === videoId);
       if (index === -1) {
@@ -291,18 +297,18 @@
       localStorage.setItem('myFavorites', JSON.stringify(favorites));
     }
 
-    // Tab Switching
+    // Tabs
     tabSearch.addEventListener("click", () => {
       tabSearch.classList.add("active"); tabFav.classList.remove("active");
       if(searchInput.value) performSearch(searchInput.value);
-      else resultsList.innerHTML = "<p style='color: #666; text-align: center;'>गाना सर्च करें।</p>";
+      else resultsList.innerHTML = "<p style='color: #666; text-align: center;'>Search for a song to begin.</p>";
     });
 
     tabFav.addEventListener("click", () => renderFavorites());
 
     function renderFavorites() {
       tabFav.classList.add("active"); tabSearch.classList.remove("active");
-      renderList(favorites, true);
+      renderList(favorites, true, false);
     }
 
     // PWA Logic
