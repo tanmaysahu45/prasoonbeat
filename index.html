@@ -90,7 +90,11 @@
     .option-row input:checked:before{transform:translateX(21px)}
     .install-now{width:100%;margin-top:14px;padding:12px;border-radius:999px;border:1px solid var(--pink);background:var(--pink);color:#fff;font-weight:800;transition:.18s}
     .install-note{font-size:11px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.4}
-    .install-banner{display:none;position:fixed;z-index:1100;bottom:85px;left:50%;transform:translateX(-50%);border:1px solid var(--pink);background:#171019;color:#fff;padding:11px 20px;border-radius:999px;font-weight:800}
+    
+    /* Install Banner Fix */
+    .install-banner{display:none;position:fixed;z-index:1100;bottom:85px;left:50%;transform:translateX(-50%);border:1px solid var(--pink);background:var(--pink);color:#fff;padding:12px 30px;border-radius:999px;font-weight:800;box-shadow:0 5px 20px rgba(255,0,85,0.4);cursor:pointer;}
+    .install-banner:active{transform:translateX(-50%) scale(0.95);}
+    
     @media(max-width:600px){
       header{padding:12px 4%}.logo{font-size:17px}.auth-btn{padding:8px 11px;font-size:12px}
       .search-section button{padding:11px 15px}
@@ -303,8 +307,6 @@
       optionsSheet.setAttribute("aria-hidden", "true");
     });
 
-
-
     function savePlayerState() {
       if (!restoreToggle.checked || !currentPlaylist.length) return;
 
@@ -364,10 +366,6 @@
 
     /* =========================
        YOUTUBE IFRAME API
-       IMPORTANT FIX:
-       The callback is registered BEFORE
-       loading the YouTube API. This avoids
-       the original race-condition bug.
        ========================= */
     window.onYouTubeIframeAPIReady = () => {
       ytPlayer = new YT.Player("yt-player", {
@@ -664,8 +662,6 @@
           startSeconds: 0
         });
 
-        /* This call happens from a user action when the song
-           is selected or the play button is pressed. */
         ytPlayer.unMute();
         isMuted = false;
         muteBtn.textContent = "🔊";
@@ -698,7 +694,6 @@
         if (isPlaying) {
           ytPlayer.pauseVideo();
         } else {
-          /* User gesture: browser is much more likely to allow sound here. */
           ytPlayer.unMute();
           isMuted = false;
           muteBtn.textContent = "🔊";
@@ -740,8 +735,6 @@
       audioModeBtn.classList.remove("active");
       screenBox.classList.add("video-mode");
 
-      /* User clicked the mode button, so unmute/play is allowed
-         by normal browser user-gesture rules. */
       if (ytReady && ytPlayer && ytPlayer.getVideoData().video_id) {
         ytPlayer.unMute();
         isMuted = false;
@@ -840,66 +833,63 @@
       renderList(favorites, true);
     }
 
-
     /* =========================
-       PWA INSTALL
+       PWA INSTALL (FORCE INSTALL)
        ========================= */
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("./service-worker.js")
-          .then(() => console.log("Service Worker Registered successfully"))
-          .catch(err => console.error("Service Worker Error:", err));
+          .catch(err => console.error("SW Error:", err));
       });
     }
 
     let deferredPrompt = null;
     const installBtn = $("pwa-install-btn");
+    const installNowBtn = $("install-now");
 
-    function showInstallUI() {
-      installBtn.style.display = "block";
-      installNow.disabled = false;
-      installNow.textContent = "📲 Install App";
+    // अगर ऐप पहले से इन्स्टॉल है, तो बटन छुपा दो
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+      installBtn.style.display = 'none';
+      installNowBtn.textContent = "✓ Installed";
+      installNowBtn.disabled = true;
     }
 
-    function hideInstallUI() {
-      installBtn.style.display = "none";
-      installNow.disabled = true;
-      installNow.textContent = "✓ Installed";
-    }
-
-    window.addEventListener("beforeinstallprompt", e => {
+    window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      showInstallUI();
+      installBtn.style.display = "block";
+      installNowBtn.textContent = "📲 Install App";
+      installNowBtn.disabled = false;
     });
 
-    async function installPWA() {
+    // इंस्टॉल बटन क्लिक करने पर लॉजिक
+    async function handleInstallClick() {
       if (deferredPrompt) {
+        // सीधा ब्राउज़र का इंस्टॉल पॉपअप दिखाओ
         deferredPrompt.prompt();
-        const result = await deferredPrompt.userChoice;
-        if (result.outcome === "accepted") hideInstallUI();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          installBtn.style.display = 'none';
+          installNowBtn.textContent = "✓ Installed";
+          installNowBtn.disabled = true;
+        }
         deferredPrompt = null;
-        return;
+      } else {
+        // अगर ब्राउज़र सपोर्ट नहीं कर रहा या प्रॉम्प्ट मिसिंग है
+        alert("ऐप्प इंस्टॉल करने के लिए Chrome में सबसे ऊपर दाईं ओर 3-dots (⋮) पर क्लिक करें और 'Add to Home screen' या 'Install app' चुनें।");
       }
-
-      /* iOS/unsupported browsers cannot be forced to install by JavaScript.
-         Show a useful instruction instead of pretending installation happened. */
-      installNow.textContent = "Browser menu → Install app";
-      playerStatus.textContent = "If Install isn't offered, open the browser menu and choose Install app.";
     }
 
-    installBtn.addEventListener("click", installPWA);
-    installNow.addEventListener("click", installPWA);
+    installBtn.addEventListener("click", handleInstallClick);
+    installNowBtn.addEventListener("click", handleInstallClick);
 
+    // इंस्टॉल पूरा होने के बाद का एक्शन
     window.addEventListener("appinstalled", () => {
-      hideInstallUI();
-      playerStatus.textContent = "App installed successfully.";
+      installBtn.style.display = "none";
+      installNowBtn.textContent = "✓ Installed";
+      installNowBtn.disabled = true;
+      alert("App सफलतापूर्वक इंस्टॉल हो गया है! अब आप इसे अपनी Home Screen से डायरेक्ट खोल सकते हैं।");
     });
-
-    if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true) {
-      hideInstallUI();
-    }
-
   </script>
 </body>
 </html>
