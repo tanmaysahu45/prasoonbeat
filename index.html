@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#ff0055">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Prasoon Music">
+  <link rel="manifest" href="./manifest.json">
   <title>Prasoon Music Player</title>
 
   <style>
@@ -70,6 +75,21 @@
     .bp-btn{font-size:18px}
     .bp-play-btn{background:var(--pink);border-color:var(--pink);font-size:17px;box-shadow:0 5px 20px rgba(255,0,85,.25)}
     .status{font-size:11px;color:var(--muted);text-align:center;margin:9px auto 0}
+    .options-fab{position:fixed;right:18px;bottom:78px;z-index:1050;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(25,25,32,.94);color:#fff;box-shadow:0 8px 25px rgba(0,0,0,.35);transition:.18s}
+    .options-fab:active,.close-options:active,.install-now:active{transform:scale(.9)}
+    .options-sheet{position:fixed;left:50%;bottom:0;z-index:1200;width:min(94%,520px);transform:translate(-50%,110%);opacity:0;pointer-events:none;background:#181820;border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;padding:18px;box-shadow:0 -20px 50px rgba(0,0,0,.55);transition:.25s}
+    .options-sheet.open{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+    .options-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .close-options{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;color:#fff;transition:.18s}
+    .option-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px 2px;border-top:1px solid var(--line)}
+    .option-row span{display:flex;flex-direction:column;gap:3px}
+    .option-row small{color:var(--muted);font-size:11px}
+    .option-row input{appearance:none;width:48px;height:27px;border-radius:30px;background:#33333d;border:1px solid #444;position:relative;transition:.2s;flex:none}
+    .option-row input:before{content:"";position:absolute;width:21px;height:21px;left:2px;top:2px;border-radius:50%;background:#fff;transition:.2s}
+    .option-row input:checked{background:var(--pink);border-color:var(--pink)}
+    .option-row input:checked:before{transform:translateX(21px)}
+    .install-now{width:100%;margin-top:14px;padding:12px;border-radius:999px;border:1px solid var(--pink);background:var(--pink);color:#fff;font-weight:800;transition:.18s}
+    .install-note{font-size:11px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.4}
     .install-banner{display:none;position:fixed;z-index:1100;bottom:85px;left:50%;transform:translateX(-50%);border:1px solid var(--pink);background:#171019;color:#fff;padding:11px 20px;border-radius:999px;font-weight:800}
     @media(max-width:600px){
       header{padding:12px 4%}.logo{font-size:17px}.auth-btn{padding:8px 11px;font-size:12px}
@@ -161,6 +181,25 @@
 
   <div class="install-banner" id="pwa-install-btn">📲 Install App</div>
 
+  <div class="options-sheet" id="options-sheet" aria-hidden="true">
+    <div class="options-head">
+      <strong>Player Options</strong>
+      <button id="close-options" class="close-options">✕</button>
+    </div>
+    <label class="option-row">
+      <span><b>🔄 Restore after refresh</b><small>Song, mode and player state याद रखें</small></span>
+      <input id="restore-toggle" type="checkbox" checked>
+    </label>
+    <label class="option-row">
+      <span><b>🔊 Remember volume</b><small>Mute/unmute preference याद रखें</small></span>
+      <input id="volume-toggle" type="checkbox" checked>
+    </label>
+    <button id="install-now" class="install-now">📲 Install App</button>
+    <p class="install-note" id="install-note">Install तभी उपलब्ध होगा जब browser PWA install को अनुमति दे।</p>
+  </div>
+
+  <button class="options-fab" id="options-fab" title="Options">⚙️</button>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
     import {
@@ -234,6 +273,95 @@
     let currentSongIndex = 0;
     let favorites = JSON.parse(localStorage.getItem("myFavorites") || "[]");
 
+    const optionsFab = $("options-fab");
+    const optionsSheet = $("options-sheet");
+    const closeOptions = $("close-options");
+    const installNow = $("install-now");
+    const restoreToggle = $("restore-toggle");
+    const volumeToggle = $("volume-toggle");
+
+    const savedRestore = localStorage.getItem("pm_restore");
+    const savedVolume = localStorage.getItem("pm_volume");
+    if (savedRestore !== null) restoreToggle.checked = savedRestore === "1";
+    if (savedVolume !== null) volumeToggle.checked = savedVolume === "1";
+
+    restoreToggle.addEventListener("change", () => {
+      localStorage.setItem("pm_restore", restoreToggle.checked ? "1" : "0");
+      if (!restoreToggle.checked) localStorage.removeItem("pm_state");
+    });
+
+    volumeToggle.addEventListener("change", () => {
+      localStorage.setItem("pm_volume", volumeToggle.checked ? "1" : "0");
+    });
+
+    optionsFab.addEventListener("click", () => {
+      optionsSheet.classList.add("open");
+      optionsSheet.setAttribute("aria-hidden", "false");
+    });
+    closeOptions.addEventListener("click", () => {
+      optionsSheet.classList.remove("open");
+      optionsSheet.setAttribute("aria-hidden", "true");
+    });
+
+
+
+    function savePlayerState() {
+      if (!restoreToggle.checked || !currentPlaylist.length) return;
+
+      const state = {
+        videoId: currentPlaylist[currentSongIndex]?.videoId || "",
+        title: currentPlaylist[currentSongIndex]?.title || "",
+        author: currentPlaylist[currentSongIndex]?.author || "",
+        thumb: currentPlaylist[currentSongIndex]?.thumb || "",
+        mode: screenBox.classList.contains("video-mode") ? "video" : "audio",
+        muted: isMuted,
+        playing: isPlaying
+      };
+      localStorage.setItem("pm_state", JSON.stringify(state));
+    }
+
+    function restorePlayerState() {
+      if (!restoreToggle.checked) return;
+      const raw = localStorage.getItem("pm_state");
+      if (!raw) return;
+
+      try {
+        const state = JSON.parse(raw);
+        if (!state.videoId) return;
+
+        const restoredSong = {
+          videoId: state.videoId,
+          title: state.title || "Restored Song",
+          author: state.author || "YouTube",
+          thumb: state.thumb || "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500"
+        };
+
+        currentPlaylist = [restoredSong];
+        currentSongIndex = 0;
+        bpTitle.textContent = restoredSong.title;
+        bpArtist.textContent = restoredSong.author;
+        bpThumb.src = restoredSong.thumb;
+        posterArt.src = restoredSong.thumb;
+        nowPlayingSmall.textContent = restoredSong.title;
+
+        if (state.mode === "video") {
+          videoModeBtn.click();
+        } else {
+          audioModeBtn.click();
+        }
+
+        pendingVideoId = restoredSong.videoId;
+        playerStatus.textContent = "Restored. Press Play to continue.";
+      } catch (e) {
+        console.warn("Could not restore player state", e);
+      }
+    }
+
+    window.addEventListener("beforeunload", savePlayerState);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") savePlayerState();
+    });
+
     /* =========================
        YOUTUBE IFRAME API
        IMPORTANT FIX:
@@ -274,7 +402,19 @@
       if (pendingVideoId) {
         const id = pendingVideoId;
         pendingVideoId = null;
-        playVideoId(id);
+        try {
+          ytPlayer.cueVideoById(id);
+          playerStatus.textContent = "Restored. Press Play to continue.";
+        } catch (e) {
+          console.warn(e);
+        }
+      } else {
+        restorePlayerState();
+        if (pendingVideoId) {
+          const id = pendingVideoId;
+          pendingVideoId = null;
+          try { ytPlayer.cueVideoById(id); } catch(e) {}
+        }
       }
     }
 
@@ -288,6 +428,7 @@
           posterArt.classList.add("spin");
           screenMessage.classList.add("hidden");
           playerStatus.textContent = "Playing";
+          savePlayerState();
           break;
 
         case YT.PlayerState.PAUSED:
@@ -295,6 +436,7 @@
           btnPlay.textContent = "▶";
           posterArt.classList.remove("spin");
           playerStatus.textContent = "Paused";
+          savePlayerState();
           break;
 
         case YT.PlayerState.BUFFERING:
@@ -590,6 +732,7 @@
       videoModeBtn.classList.remove("active");
       screenBox.classList.remove("video-mode");
       playerStatus.textContent = isPlaying ? "Playing in Audio Mode" : "Audio Mode";
+      savePlayerState();
     });
 
     videoModeBtn.addEventListener("click", () => {
@@ -607,6 +750,7 @@
       }
 
       playerStatus.textContent = isPlaying ? "Playing in Video Mode" : "Video Mode";
+      savePlayerState();
     });
 
     /* =========================
@@ -619,10 +763,14 @@
         ytPlayer.unMute();
         isMuted = false;
         muteBtn.textContent = "🔊";
+        if (volumeToggle.checked) localStorage.setItem("pm_muted", "0");
+        savePlayerState();
       } else {
         ytPlayer.mute();
         isMuted = true;
         muteBtn.textContent = "🔇";
+        if (volumeToggle.checked) localStorage.setItem("pm_muted", "1");
+        savePlayerState();
       }
     });
 
@@ -692,33 +840,58 @@
       renderList(favorites, true);
     }
 
-    /* =========================
-       PWA
-       ========================= */
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js").catch(err => {
-          console.warn("Service worker not registered:", err);
-        });
-      });
-    }
 
+    /* =========================
+       PWA INSTALL
+       ========================= */
     let deferredPrompt = null;
     const installBtn = $("pwa-install-btn");
+
+    function showInstallUI() {
+      installBtn.style.display = "block";
+      installNow.disabled = false;
+      installNow.textContent = "📲 Install App";
+    }
+
+    function hideInstallUI() {
+      installBtn.style.display = "none";
+      installNow.disabled = true;
+      installNow.textContent = "✓ Installed";
+    }
 
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.style.display = "block";
+      showInstallUI();
     });
 
-    installBtn.addEventListener("click", async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.style.display = "none";
+    async function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const result = await deferredPrompt.userChoice;
+        if (result.outcome === "accepted") hideInstallUI();
+        deferredPrompt = null;
+        return;
+      }
+
+      /* iOS/unsupported browsers cannot be forced to install by JavaScript.
+         Show a useful instruction instead of pretending installation happened. */
+      installNow.textContent = "Browser menu → Install app";
+      playerStatus.textContent = "If Install isn't offered, open the browser menu and choose Install app.";
+    }
+
+    installBtn.addEventListener("click", installPWA);
+    installNow.addEventListener("click", installPWA);
+
+    window.addEventListener("appinstalled", () => {
+      hideInstallUI();
+      playerStatus.textContent = "App installed successfully.";
     });
+
+    if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true) {
+      hideInstallUI();
+    }
+
   </script>
 </body>
 </html>
