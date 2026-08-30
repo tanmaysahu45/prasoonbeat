@@ -1,24 +1,24 @@
 {
-  "name": "Prasoon Music",
+  "name": "Prasoon Music Player",
   "short_name": "Prasoon Music",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0b0b10",
   "theme_color": "#ff0055",
-  "description": "Spotify-style YouTube music player",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=192&h=192&fit=crop",
+      "src": "https://ui-avatars.com/api/?name=PM&background=ff0055&color=fff&size=192",
       "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "any"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=512&h=512&fit=crop",
+      "src": "https://ui-avatars.com/api/?name=PM&background=ff0055&color=fff&size=512",
       "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

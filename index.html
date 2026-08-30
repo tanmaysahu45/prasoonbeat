@@ -91,7 +91,6 @@
     .install-now{width:100%;margin-top:14px;padding:12px;border-radius:999px;border:1px solid var(--pink);background:var(--pink);color:#fff;font-weight:800;transition:.18s}
     .install-note{font-size:11px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.4}
     
-    /* Install Banner Fix */
     .install-banner{display:none;position:fixed;z-index:1100;bottom:85px;left:50%;transform:translateX(-50%);border:1px solid var(--pink);background:var(--pink);color:#fff;padding:12px 30px;border-radius:999px;font-weight:800;box-shadow:0 5px 20px rgba(255,0,85,0.4);cursor:pointer;}
     .install-banner:active{transform:translateX(-50%) scale(0.95);}
     
@@ -214,9 +213,6 @@
       signOut
     } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
-    /* =========================
-       CONFIG
-       ========================= */
     const firebaseConfig = {
       apiKey: "AIzaSyDwiKbKcpckYDsZfT35E8LvVmhRbrOIczQ",
       authDomain: "prasoon-song.firebaseapp.com",
@@ -232,9 +228,6 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    /* =========================
-       DOM
-       ========================= */
     const $ = id => document.getElementById(id);
     const loginBtn = $("login-btn");
     const logoutBtn = $("logout-btn");
@@ -265,9 +258,6 @@
     const tabSearch = $("tab-search");
     const tabFav = $("tab-fav");
 
-    /* =========================
-       STATE
-       ========================= */
     let ytPlayer = null;
     let ytReady = false;
     let isPlaying = false;
@@ -280,9 +270,10 @@
     const optionsFab = $("options-fab");
     const optionsSheet = $("options-sheet");
     const closeOptions = $("close-options");
-    const installNow = $("install-now");
+    const installNowBtn = $("install-now");
     const restoreToggle = $("restore-toggle");
     const volumeToggle = $("volume-toggle");
+    const installBtn = $("pwa-install-btn");
 
     const savedRestore = localStorage.getItem("pm_restore");
     const savedVolume = localStorage.getItem("pm_volume");
@@ -364,9 +355,6 @@
       if (document.visibilityState === "hidden") savePlayerState();
     });
 
-    /* =========================
-       YOUTUBE IFRAME API
-       ========================= */
     window.onYouTubeIframeAPIReady = () => {
       ytPlayer = new YT.Player("yt-player", {
         width: "100%",
@@ -428,7 +416,6 @@
           playerStatus.textContent = "Playing";
           savePlayerState();
           break;
-
         case YT.PlayerState.PAUSED:
           isPlaying = false;
           btnPlay.textContent = "▶";
@@ -436,18 +423,15 @@
           playerStatus.textContent = "Paused";
           savePlayerState();
           break;
-
         case YT.PlayerState.BUFFERING:
           playerStatus.textContent = "Buffering…";
           break;
-
         case YT.PlayerState.ENDED:
           isPlaying = false;
           btnPlay.textContent = "▶";
           posterArt.classList.remove("spin");
           playNext();
           break;
-
         case YT.PlayerState.CUED:
           playerStatus.textContent = "Ready to play";
           break;
@@ -457,7 +441,6 @@
     function onPlayerError(event) {
       isPlaying = false;
       btnPlay.textContent = "▶";
-
       const messages = {
         2: "Invalid YouTube video ID.",
         5: "This video cannot be played in this HTML5 player.",
@@ -465,15 +448,11 @@
         101: "This video does not allow embedded playback.",
         150: "This video does not allow embedded playback."
       };
-
       playerStatus.textContent = messages[event.data] || "YouTube playback error.";
       screenMessage.textContent = messages[event.data] || "This video cannot be played here.";
       screenMessage.classList.remove("hidden");
     }
 
-    /* =========================
-       AUTH
-       ========================= */
     loginBtn.addEventListener("click", async () => {
       try {
         await signInWithPopup(auth, provider);
@@ -496,11 +475,7 @@
       }
     });
 
-    /* =========================
-       SEARCH
-       ========================= */
     searchBtn.addEventListener("click", () => performSearch(searchInput.value));
-
     searchInput.addEventListener("keydown", e => {
       if (e.key === "Enter") performSearch(searchInput.value);
     });
@@ -533,9 +508,7 @@
         const data = await res.json();
 
         if (!res.ok || data.error) {
-          console.error(data);
-          resultsList.innerHTML =
-            '<p style="text-align:center;color:#ff667f">YouTube Search API error. Check API key, quota and API restrictions.</p>';
+          resultsList.innerHTML = '<p style="text-align:center;color:#ff667f">YouTube Search API error. Check API key, quota and API restrictions.</p>';
           return;
         }
 
@@ -570,9 +543,6 @@
       return textarea.value;
     }
 
-    /* =========================
-       LIST
-       ========================= */
     function renderList(items, isFavList = false) {
       currentPlaylist = items;
       resultsList.innerHTML = "";
@@ -584,7 +554,6 @@
 
       items.forEach((song, index) => {
         const loved = favorites.some(x => x.videoId === song.videoId);
-
         const card = document.createElement("div");
         card.className = "song-card";
 
@@ -628,20 +597,15 @@
       });
     }
 
-    /* =========================
-       PLAYBACK
-       ========================= */
     function loadSongData(index) {
       if (!currentPlaylist[index]) return;
 
       const song = currentPlaylist[index];
-
       bpTitle.textContent = song.title;
       bpArtist.textContent = song.author;
       bpThumb.src = song.thumb;
       posterArt.src = song.thumb;
       nowPlayingSmall.textContent = song.title;
-
       screenMessage.classList.add("hidden");
 
       if (!ytReady || !ytPlayer) {
@@ -649,23 +613,16 @@
         playerStatus.textContent = "Loading YouTube player…";
         return;
       }
-
       playVideoId(song.videoId);
     }
 
     function playVideoId(videoId) {
       if (!ytPlayer) return;
-
       try {
-        ytPlayer.loadVideoById({
-          videoId,
-          startSeconds: 0
-        });
-
+        ytPlayer.loadVideoById({ videoId, startSeconds: 0 });
         ytPlayer.unMute();
         isMuted = false;
         muteBtn.textContent = "🔊";
-
         ytPlayer.playVideo();
         playerStatus.textContent = "Starting…";
       } catch (err) {
@@ -679,17 +636,14 @@
         playerStatus.textContent = "YouTube player is still loading…";
         return;
       }
-
       if (!currentPlaylist.length) {
         playerStatus.textContent = "Search and select a song first.";
         return;
       }
-
       if (!ytPlayer.getVideoData().video_id) {
         loadSongData(currentSongIndex);
         return;
       }
-
       try {
         if (isPlaying) {
           ytPlayer.pauseVideo();
@@ -719,9 +673,6 @@
       loadSongData(currentSongIndex);
     }
 
-    /* =========================
-       AUDIO / VIDEO MODE
-       ========================= */
     audioModeBtn.addEventListener("click", () => {
       audioModeBtn.classList.add("active");
       videoModeBtn.classList.remove("active");
@@ -734,24 +685,18 @@
       videoModeBtn.classList.add("active");
       audioModeBtn.classList.remove("active");
       screenBox.classList.add("video-mode");
-
       if (ytReady && ytPlayer && ytPlayer.getVideoData().video_id) {
         ytPlayer.unMute();
         isMuted = false;
         muteBtn.textContent = "🔊";
         if (!isPlaying) ytPlayer.playVideo();
       }
-
       playerStatus.textContent = isPlaying ? "Playing in Video Mode" : "Video Mode";
       savePlayerState();
     });
 
-    /* =========================
-       SOUND
-       ========================= */
     muteBtn.addEventListener("click", () => {
       if (!ytReady || !ytPlayer) return;
-
       if (isMuted) {
         ytPlayer.unMute();
         isMuted = false;
@@ -767,40 +712,28 @@
       }
     });
 
-    /* =========================
-       FULLSCREEN
-       ========================= */
     fullscreenBtn.addEventListener("click", async () => {
       if (!ytReady || !ytPlayer) return;
-
       const iframe = ytPlayer.getIframe();
-
       try {
         if (document.fullscreenElement) {
           await document.exitFullscreen();
           return;
         }
-
         if (iframe && iframe.requestFullscreen) {
           await iframe.requestFullscreen();
           return;
         }
-
         if (screenBox.requestFullscreen) {
           await screenBox.requestFullscreen();
         }
       } catch (err) {
         console.warn("Fullscreen request failed:", err);
-        playerStatus.textContent = "Use YouTube's fullscreen button inside the video.";
       }
     });
 
-    /* =========================
-       FAVORITES
-       ========================= */
     function toggleFavorite(song, button) {
       const index = favorites.findIndex(x => x.videoId === song.videoId);
-
       if (index === -1) {
         favorites.push(song);
         button.classList.add("loved");
@@ -810,14 +743,12 @@
         button.classList.remove("loved");
         button.textContent = "🤍";
       }
-
       localStorage.setItem("myFavorites", JSON.stringify(favorites));
     }
 
     tabSearch.addEventListener("click", () => {
       tabSearch.classList.add("active");
       tabFav.classList.remove("active");
-
       if (searchInput.value.trim()) {
         performSearch(searchInput.value);
       } else {
@@ -833,21 +764,15 @@
       renderList(favorites, true);
     }
 
-    /* =========================
-       PWA INSTALL (FORCE INSTALL)
-       ========================= */
+    // 🔴 FORCE APP INSTALL LOGIC 🔴
+    let deferredPrompt = null;
+    
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js")
-          .catch(err => console.error("SW Error:", err));
+        navigator.serviceWorker.register("./service-worker.js");
       });
     }
 
-    let deferredPrompt = null;
-    const installBtn = $("pwa-install-btn");
-    const installNowBtn = $("install-now");
-
-    // अगर ऐप पहले से इन्स्टॉल है, तो बटन छुपा दो
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
       installBtn.style.display = 'none';
       installNowBtn.textContent = "✓ Installed";
@@ -862,10 +787,8 @@
       installNowBtn.disabled = false;
     });
 
-    // इंस्टॉल बटन क्लिक करने पर लॉजिक
     async function handleInstallClick() {
       if (deferredPrompt) {
-        // सीधा ब्राउज़र का इंस्टॉल पॉपअप दिखाओ
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
@@ -874,21 +797,16 @@
           installNowBtn.disabled = true;
         }
         deferredPrompt = null;
-      } else {
-        // अगर ब्राउज़र सपोर्ट नहीं कर रहा या प्रॉम्प्ट मिसिंग है
-        alert("ऐप्प इंस्टॉल करने के लिए Chrome में सबसे ऊपर दाईं ओर 3-dots (⋮) पर क्लिक करें और 'Add to Home screen' या 'Install app' चुनें।");
       }
     }
 
     installBtn.addEventListener("click", handleInstallClick);
     installNowBtn.addEventListener("click", handleInstallClick);
 
-    // इंस्टॉल पूरा होने के बाद का एक्शन
     window.addEventListener("appinstalled", () => {
       installBtn.style.display = "none";
       installNowBtn.textContent = "✓ Installed";
       installNowBtn.disabled = true;
-      alert("App सफलतापूर्वक इंस्टॉल हो गया है! अब आप इसे अपनी Home Screen से डायरेक्ट खोल सकते हैं।");
     });
   </script>
 </body>
