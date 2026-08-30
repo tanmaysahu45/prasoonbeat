@@ -126,6 +126,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
+    // --- FIREBASE SETUP ---
     const firebaseConfig = {
       apiKey: "AIzaSyDwiKbKcpckYDsZfT35E8LvVmhRbrOIczQ",
       authDomain: "prasoon-song.firebaseapp.com",
@@ -140,6 +141,7 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
+    // --- DOM ELEMENTS ---
     const loginBtn = document.getElementById("login-btn");
     const logoutBtn = document.getElementById("logout-btn");
     const userInfo = document.getElementById("user-info");
@@ -164,6 +166,7 @@
     let ytPlayer;
     let favorites = JSON.parse(localStorage.getItem('myFavorites')) || [];
 
+    // --- AUTHENTICATION ---
     loginBtn.addEventListener("click", () => signInWithPopup(auth, provider));
     logoutBtn.addEventListener("click", () => signOut(auth));
     onAuthStateChanged(auth, (user) => {
@@ -177,6 +180,7 @@
       }
     });
 
+    // --- YOUTUBE PLAYER ---
     window.onYouTubeIframeAPIReady = function () {
       ytPlayer = new YT.Player("yt-player", {
         height: "100%", width: "100%", videoId: "jfKfPfyJRdk", 
@@ -193,6 +197,9 @@
       videoWrapper.style.display = "block"; audioWrapper.style.display = "none";
     });
 
+    // --- YOUTUBE API SEARCH ---
+    const YOUTUBE_API_KEY = "AIzaSyCsgzh8SGJvzEt4z7y4aJ7mHIR6NgOE3Xg"; // आपकी नई असली API Key
+
     searchBtn.addEventListener("click", () => performSearch(searchInput.value));
     searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") performSearch(searchInput.value); });
     
@@ -204,67 +211,56 @@
       });
     });
 
-    // 🔴 NEW ROBUST SEARCH SYSTEM (Multiple Servers)
     async function performSearch(query) {
       if (!query.trim()) return;
-      resultsList.innerHTML = "<p style='text-align:center; color:#ff0055; font-weight:bold;'>Searching servers...</p>";
+      resultsList.innerHTML = "<p style='text-align:center; color:#ff0055; font-weight:bold;'>YouTube से सर्च किया जा रहा है...</p>";
       
-      // List of 5 different backup servers
-      const urls = [
-        `https://pipedapi.smnz.de/search?q=${encodeURIComponent(query)}&filter=videos`,
-        `https://pipedapi.tokhmi.xyz/search?q=${encodeURIComponent(query)}&filter=videos`,
-        `https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=videos`,
-        `https://invidious.nerdvpn.de/api/v1/search?q=${encodeURIComponent(query)}&type=video`,
-        `https://inv.tux.pizza/api/v1/search?q=${encodeURIComponent(query)}&type=video`
-      ];
+      const endpoint = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=12&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
 
-      for (let url of urls) {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) continue; 
-          
-          const data = await res.json();
-          let items = [];
-          let isPiped = url.includes("piped");
-
-          if (isPiped && data.items && data.items.length > 0) {
-             items = data.items;
-          } else if (!isPiped && data.length > 0) {
-             items = data;
-          }
-
-          if (items.length > 0) {
-            renderList(items.slice(0, 10), false, isPiped);
-            return; // ✅ Success! Stop checking other servers
-          }
-        } catch (err) {
-          console.log("Server skipped:", url);
+      try {
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        
+        if (data.error) {
+          resultsList.innerHTML = `<p style='color:red; text-align:center;'>API Error: ${data.error.message}</p>`;
+          return;
         }
-      }
 
-      // If all 5 servers are down
-      resultsList.innerHTML = "<p style='color:red; text-align:center;'>All free servers are currently busy. Try again in a minute!</p>";
+        if (!data.items || data.items.length === 0) {
+          resultsList.innerHTML = "<p style='text-align:center; color:#888;'>कोई गाना नहीं मिला।</p>";
+          return;
+        }
+
+        // Search successful, render the items
+        renderList(data.items, false);
+      } catch (err) {
+        resultsList.innerHTML = "<p style='color:red; text-align:center;'>इंटरनेट कनेक्शन या सर्वर में दिक्कत है।</p>";
+      }
     }
 
-    function renderList(items, isFavList = false, isPipedData = false) {
+    // --- RENDER LIST ---
+    function renderList(items, isFavList = false) {
       resultsList.innerHTML = "";
       if(items.length === 0) {
-        resultsList.innerHTML = "<p style='color:#888; text-align:center;'>No songs found.</p>"; return;
+        resultsList.innerHTML = "<p style='color:#888; text-align:center;'>कोई गाना नहीं मिला।</p>"; return;
       }
       
       items.forEach((item) => {
         let videoId, title, author, thumb;
 
-        if (isPipedData) {
-          videoId = item.url.split('?v=')[1];
-          title = item.title;
-          author = item.uploaderName;
-          thumb = item.thumbnail;
-        } else {
+        if (isFavList) {
+          // फेवरेट लिस्ट (LocalStorage) से डेटा आ रहा है
           videoId = item.videoId;
           title = item.title;
           author = item.author;
-          thumb = item.videoThumbnails ? item.videoThumbnails[0].url : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+          thumb = item.thumb;
+        } else {
+          // YouTube API से डेटा आ रहा है
+          videoId = item.id.videoId;
+          if (!videoId) return; // अगर कोई चैनल या प्लेलिस्ट है, तो उसे इग्नोर करें
+          title = item.snippet.title;
+          author = item.snippet.channelTitle;
+          thumb = item.snippet.thumbnails.high.url;
         }
         
         const isFav = favorites.some(fav => fav.videoId === videoId);
@@ -295,7 +291,7 @@
     }
 
     function playSong(videoId, title, author, thumb) {
-      currentTitle.innerText = title; currentArtist.innerText = author; posterArt.src = thumb;
+      currentTitle.innerHTML = title; currentArtist.innerText = author; posterArt.src = thumb;
       if (ytPlayer && ytPlayer.loadVideoById) { ytPlayer.loadVideoById(videoId); ytPlayer.playVideo(); }
     }
 
@@ -314,16 +310,17 @@
     tabSearch.addEventListener("click", () => {
       tabSearch.classList.add("active"); tabFav.classList.remove("active");
       if(searchInput.value) performSearch(searchInput.value);
-      else resultsList.innerHTML = "<p style='color: #666; text-align: center;'>Search for a song to begin.</p>";
+      else resultsList.innerHTML = "<p style='color: #666; text-align: center;'>गाना सर्च करें।</p>";
     });
 
     tabFav.addEventListener("click", () => renderFavorites());
 
     function renderFavorites() {
       tabFav.classList.add("active"); tabSearch.classList.remove("active");
-      renderList(favorites, true, false);
+      renderList(favorites, true);
     }
 
+    // --- PWA LOGIC ---
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./service-worker.js");
     }
