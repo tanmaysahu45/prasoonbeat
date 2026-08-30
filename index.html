@@ -3,154 +3,177 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Prasoon Music Player</title>
-  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ff0055">
+  <title>Prasoon Music Player</title>
+
   <style>
-    /* --- MOBILE-FIRST CSS --- */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-    body { background-color: #0f0f12; color: #ffffff; padding-bottom: 120px; } /* Bottom player ke liye jagah */
-    
-    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: #18181f; border-bottom: 1px solid #282833; }
-    .logo { font-size: 1.2rem; font-weight: 800; color: #ff0055; }
-    .auth-btn { background: #ff0055; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 13px; }
-    .user-profile { display: none; align-items: center; gap: 10px; }
-    .user-profile img { width: 35px; height: 35px; border-radius: 50%; }
-    
-    .search-section { display: flex; padding: 15px 5%; gap: 10px; width: 100%; max-width: 600px; margin: auto; }
-    .search-section input { flex: 1; padding: 12px 16px; border-radius: 25px; border: 1px solid #333; background: #1c1c24; color: #fff; outline: none; font-size: 14px; }
-    .search-section button { padding: 12px 20px; background: #252533; color: #fff; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; }
-    
-    .fav-singers { display: flex; gap: 10px; overflow-x: auto; padding: 0 5% 15px; width: 100%; max-width: 600px; margin: auto; scrollbar-width: none; }
-    .fav-singers::-webkit-scrollbar { display: none; }
-    .singer-tag { padding: 8px 16px; background: #1c1c24; border-radius: 20px; font-size: 13px; white-space: nowrap; cursor: pointer; border: 1px solid #333; transition: 0.2s; }
-    .singer-tag:hover { background: #ff0055; border-color: #ff0055; }
-
-    .player-container { width: 90%; max-width: 500px; margin: 10px auto; padding: 20px; background: #18181f; border-radius: 20px; text-align: center; border: 1px solid #282833; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .mode-toggle { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; background: #121217; padding: 6px; border-radius: 25px; }
-    .mode-btn { flex: 1; background: transparent; color: #888; border: none; padding: 8px 0; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.3s; }
-    .mode-btn.active { background: #ff0055; color: #fff; }
-    
-    .screen-box { width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
-    
-    /* Playback Fix: Never use display:none for iframes */
-    #video-wrapper { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 10; transition: opacity 0.3s; }
-    .audio-mode-active #video-wrapper { opacity: 0; pointer-events: none; z-index: -1; }
-    
-    .audio-display { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: absolute; z-index: 5; background: #000; }
-    .rotating-disc { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 25px rgba(255, 0, 85, 0.3); }
-    .rotating-disc.spin { animation: spin 8s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    
-    .tab-section { width: 90%; max-width: 600px; margin: 25px auto 15px; display: flex; justify-content: center; gap: 20px; border-bottom: 1px solid #282833; }
-    .tab-btn { background: none; border: none; color: #888; font-size: 15px; font-weight: bold; cursor: pointer; padding-bottom: 10px; transition: 0.2s; }
-    .tab-btn.active { color: #fff; border-bottom: 3px solid #ff0055; }
-
-    .results-section { width: 90%; max-width: 600px; margin: 0 auto; }
-    .song-list { display: flex; flex-direction: column; gap: 12px; }
-    .song-card { display: flex; align-items: center; gap: 15px; background: #1c1c24; padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
-    .song-card:active { background: #252533; border-color: #ff0055; }
-    .song-card img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
-    .song-meta { flex: 1; overflow: hidden; }
-    .song-meta h4 { font-size: 14px; margin-bottom: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-    .song-meta p { font-size: 12px; color: #888; }
-    .fav-btn { background: none; border: none; font-size: 22px; cursor: pointer; padding: 5px; color: #555; }
-    .fav-btn.loved { color: #ff0055; }
-
-    /* --- SPOTIFY-LIKE BOTTOM PLAYER --- */
-    .bottom-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #18181f; border-top: 1px solid #282833; padding: 10px 5%; display: flex; align-items: center; justify-content: space-between; z-index: 1000; box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
-    .bp-info { display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden; }
-    .bp-info img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
-    .bp-text { overflow: hidden; }
-    .bp-text h4 { font-size: 14px; margin-bottom: 2px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-    .bp-text p { font-size: 12px; color: #888; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-    .bp-controls { display: flex; align-items: center; gap: 15px; }
-    .bp-btn { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 5px; }
-    .bp-play-btn { background: #ff0055; color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-    .install-banner { display: none; position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: #ff0055; color: #fff; padding: 12px 25px; border-radius: 30px; font-weight: 700; cursor: pointer; z-index: 100; box-shadow: 0 5px 20px rgba(255,0,85,0.4); width: 80%; max-width: 300px; text-align: center; }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    :root{--pink:#ff0055;--bg:#0b0b10;--panel:#15151d;--panel2:#1d1d27;--line:#2b2b38;--muted:#8d8d9d}
+    body{background:radial-gradient(circle at top,#19111a 0,#0b0b10 42%);color:#fff;min-height:100vh;padding-bottom:110px}
+    button,input{font:inherit}
+    button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+    header{position:sticky;top:0;z-index:100;background:rgba(15,15,20,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:14px 5%;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-weight:900;font-size:20px;color:var(--pink);letter-spacing:-.4px}
+    .auth-btn,.search-section button{border:1px solid var(--pink);background:transparent;color:#fff;border-radius:999px;padding:9px 15px;font-weight:700;transition:.18s}
+    .auth-btn:active,.search-section button:active,.mode-btn:active,.tab-btn:active,.bp-btn:active,.bp-play-btn:active,.screen-action:active{transform:scale(.92)}
+    .user-profile{display:none;align-items:center;gap:8px}
+    .user-profile img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+    .search-section{width:90%;max-width:680px;margin:18px auto 10px;display:flex;gap:9px}
+    .search-section input{min-width:0;flex:1;padding:13px 17px;border:1px solid var(--line);background:var(--panel);color:#fff;border-radius:999px;outline:none}
+    .search-section input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,0,85,.12)}
+    .search-section button{padding:12px 20px}
+    .fav-singers{width:90%;max-width:680px;margin:auto;display:flex;gap:8px;overflow:auto;padding:2px 0 13px;scrollbar-width:none}
+    .fav-singers::-webkit-scrollbar{display:none}
+    .singer-tag{white-space:nowrap;padding:8px 13px;background:var(--panel);border:1px solid var(--line);border-radius:999px;font-size:13px;color:#ddd;transition:.18s}
+    .singer-tag:hover{border-color:var(--pink);color:#fff}
+    .player-container{width:92%;max-width:720px;margin:8px auto 20px;background:linear-gradient(145deg,#191923,#111118);border:1px solid var(--line);border-radius:24px;padding:14px;box-shadow:0 18px 55px rgba(0,0,0,.42)}
+    .mode-toggle{display:flex;gap:6px;background:#0c0c11;border:1px solid var(--line);padding:5px;border-radius:999px;margin-bottom:12px}
+    .mode-btn{flex:1;border:1px solid transparent;background:transparent;color:var(--muted);padding:10px;border-radius:999px;font-weight:800;transition:.18s}
+    .mode-btn.active{background:var(--pink);border-color:var(--pink);color:#fff;box-shadow:0 5px 20px rgba(255,0,85,.22)}
+    .screen-box{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:16px;background:#000;border:1px solid #30303b}
+    .audio-display{position:absolute;inset:0;z-index:2;background:radial-gradient(circle,#21151e,#050507 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:.25s}
+    .rotating-disc{width:min(38vw,190px);height:min(38vw,190px);border-radius:50%;object-fit:cover;box-shadow:0 0 40px rgba(255,0,85,.23);border:5px solid #262630}
+    .rotating-disc.spin{animation:spin 8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .now-playing-small{max-width:80%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#ddd;font-size:13px}
+    #video-wrapper{position:absolute;inset:0;z-index:4;background:#000;opacity:0;pointer-events:none;transition:opacity .22s}
+    #yt-player,#yt-player iframe{width:100%!important;height:100%!important}
+    .video-mode #video-wrapper{opacity:1;pointer-events:auto}
+    .video-mode .audio-display{opacity:0;pointer-events:none}
+    .screen-actions{position:absolute;right:10px;top:10px;z-index:7;display:flex;gap:7px}
+    .screen-action{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.58);color:#fff;backdrop-filter:blur(8px);transition:.18s}
+    .screen-message{position:absolute;z-index:8;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;color:#aaa;background:rgba(0,0,0,.35);pointer-events:none}
+    .screen-message.hidden{display:none}
+    .tab-section{width:92%;max-width:680px;margin:22px auto 13px;display:flex;gap:22px;border-bottom:1px solid var(--line)}
+    .tab-btn{border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);padding:10px 3px;font-weight:800;transition:.18s}
+    .tab-btn.active{color:#fff;border-bottom-color:var(--pink)}
+    .results-section{width:92%;max-width:680px;margin:auto}
+    .song-list{display:flex;flex-direction:column;gap:10px}
+    .song-card{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid transparent;padding:10px;border-radius:15px;transition:.18s}
+    .song-card:hover{border-color:#3a3a48;transform:translateY(-1px)}
+    .song-card:active{transform:scale(.985);border-color:var(--pink)}
+    .song-card img{width:58px;height:58px;border-radius:10px;object-fit:cover;flex:none}
+    .song-meta{min-width:0;flex:1}
+    .song-meta h4{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+    .song-meta p{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .fav-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:transparent;color:#777;font-size:19px;transition:.18s;flex:none}
+    .fav-btn.loved{color:var(--pink);border-color:var(--pink)}
+    .bottom-player{position:fixed;z-index:1000;left:0;right:0;bottom:0;background:rgba(20,20,27,.94);backdrop-filter:blur(20px);border-top:1px solid var(--line);padding:10px 4%;display:flex;align-items:center;gap:12px;box-shadow:0 -12px 35px rgba(0,0,0,.35)}
+    .bp-info{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+    .bp-info img{width:48px;height:48px;border-radius:9px;object-fit:cover;flex:none}
+    .bp-text{min-width:0}
+    .bp-text h4,.bp-text p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bp-text h4{font-size:13px;margin-bottom:3px}
+    .bp-text p{font-size:11px;color:var(--muted)}
+    .bp-controls{display:flex;align-items:center;gap:5px}
+    .bp-btn,.bp-play-btn{border:1px solid transparent;background:transparent;color:#fff;width:39px;height:39px;border-radius:50%;transition:.18s}
+    .bp-btn{font-size:18px}
+    .bp-play-btn{background:var(--pink);border-color:var(--pink);font-size:17px;box-shadow:0 5px 20px rgba(255,0,85,.25)}
+    .status{font-size:11px;color:var(--muted);text-align:center;margin:9px auto 0}
+    .install-banner{display:none;position:fixed;z-index:1100;bottom:85px;left:50%;transform:translateX(-50%);border:1px solid var(--pink);background:#171019;color:#fff;padding:11px 20px;border-radius:999px;font-weight:800}
+    @media(max-width:600px){
+      header{padding:12px 4%}.logo{font-size:17px}.auth-btn{padding:8px 11px;font-size:12px}
+      .search-section button{padding:11px 15px}
+      .bottom-player{padding:9px 3%;gap:5px}.bp-info img{width:43px;height:43px}.bp-controls{gap:0}.bp-btn,.bp-play-btn{width:36px;height:36px}
+      .bp-btn:first-child,.bp-btn:last-child{font-size:16px}
+    }
   </style>
 </head>
-<body>
 
+<body>
   <header>
     <div class="logo">⚡ Prasoon Music</div>
     <div>
       <button class="auth-btn" id="login-btn">Google Login</button>
       <div class="user-profile" id="user-info">
         <img id="user-img" src="" alt="User">
-        <button class="auth-btn" id="logout-btn" style="background: #333;">Logout</button>
+        <button class="auth-btn" id="logout-btn">Logout</button>
       </div>
     </div>
   </header>
 
   <div class="search-section">
-    <input type="text" id="search-input" placeholder="Search songs or artists...">
+    <input id="search-input" type="search" placeholder="Search songs or artists..." autocomplete="off">
     <button id="search-btn">Search</button>
   </div>
 
   <div class="fav-singers">
-    <div class="singer-tag" data-singer="Arijit Singh">Arijit Singh</div>
-    <div class="singer-tag" data-singer="Shreya Ghoshal">Shreya Ghoshal</div>
-    <div class="singer-tag" data-singer="Atif Aslam">Atif Aslam</div>
-    <div class="singer-tag" data-singer="The Weeknd">The Weeknd</div>
-    <div class="singer-tag" data-singer="Jubin Nautiyal">Jubin Nautiyal</div>
-    <div class="singer-tag" data-singer="Badshah">Badshah</div>
+    <button class="singer-tag" data-singer="Arijit Singh">Arijit Singh</button>
+    <button class="singer-tag" data-singer="Shreya Ghoshal">Shreya Ghoshal</button>
+    <button class="singer-tag" data-singer="Atif Aslam">Atif Aslam</button>
+    <button class="singer-tag" data-singer="The Weeknd">The Weeknd</button>
+    <button class="singer-tag" data-singer="Jubin Nautiyal">Jubin Nautiyal</button>
+    <button class="singer-tag" data-singer="Badshah">Badshah</button>
   </div>
 
-  <div class="player-container">
+  <main class="player-container">
     <div class="mode-toggle">
       <button class="mode-btn active" id="audio-mode-btn">🎵 Audio Mode</button>
       <button class="mode-btn" id="video-mode-btn">🎬 Video Mode</button>
     </div>
 
-    <!-- Added audio-mode-active class for safe hiding -->
-    <div class="screen-box audio-mode-active" id="screen-box">
+    <div class="screen-box" id="screen-box">
       <div class="audio-display">
-        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300" id="poster-art" class="rotating-disc" alt="Album Art">
+        <img id="poster-art" class="rotating-disc" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500" alt="Album Art">
+        <div class="now-playing-small" id="now-playing-small">Select a song to start</div>
       </div>
+
       <div id="video-wrapper">
         <div id="yt-player"></div>
       </div>
+
+      <div class="screen-actions">
+        <button class="screen-action" id="mute-btn" title="Mute / Unmute">🔊</button>
+        <button class="screen-action" id="fullscreen-btn" title="Fullscreen">⛶</button>
+      </div>
+
+      <div class="screen-message" id="screen-message">Search a song, then tap a result to play it.</div>
     </div>
-  </div>
+
+    <div class="status" id="player-status">Player is ready when YouTube finishes loading.</div>
+  </main>
 
   <div class="tab-section">
     <button class="tab-btn active" id="tab-search">Search Results</button>
     <button class="tab-btn" id="tab-fav">Favorites ❤️</button>
   </div>
 
-  <div class="results-section">
+  <section class="results-section">
     <div class="song-list" id="results-list">
-      <p style="color: #666; font-size: 14px; text-align: center; margin-top: 15px;">Search for a song to begin.</p>
+      <p style="color:#666;text-align:center;margin:15px 0">Search for a song to begin.</p>
     </div>
-  </div>
+  </section>
 
-  <!-- SPOTIFY STYLE BOTTOM CONTROLS -->
   <div class="bottom-player">
     <div class="bp-info">
-      <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100" id="bp-thumb" alt="thumb">
+      <img id="bp-thumb" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120" alt="thumb">
       <div class="bp-text">
         <h4 id="bp-title">Select a Song</h4>
-        <p id="bp-artist">MyBeat Engine</p>
+        <p id="bp-artist">Prasoon Music</p>
       </div>
     </div>
     <div class="bp-controls">
-      <button class="bp-btn" id="btn-prev">⏮</button>
-      <button class="bp-play-btn" id="btn-play">▶</button>
-      <button class="bp-btn" id="btn-next">⏭</button>
+      <button class="bp-btn" id="btn-prev" title="Previous">⏮</button>
+      <button class="bp-play-btn" id="btn-play" title="Play / Pause">▶</button>
+      <button class="bp-btn" id="btn-next" title="Next">⏭</button>
     </div>
   </div>
 
   <div class="install-banner" id="pwa-install-btn">📲 Install App</div>
 
-  <script src="https://www.youtube.com/iframe_api"></script>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+    import {
+      getAuth,
+      signInWithPopup,
+      GoogleAuthProvider,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
-    // --- FIREBASE SETUP ---
+    /* =========================
+       CONFIG
+       ========================= */
     const firebaseConfig = {
       apiKey: "AIzaSyDwiKbKcpckYDsZfT35E8LvVmhRbrOIczQ",
       authDomain: "prasoon-song.firebaseapp.com",
@@ -160,264 +183,541 @@
       appId: "1:636681408672:web:a3cdda744dd758754d39c5"
     };
 
+    const YOUTUBE_API_KEY = "AIzaSyCsgzh8SGJvzEt4z7y4aJ7mHIR6NgOE3Xg";
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // --- DOM ELEMENTS ---
-    const loginBtn = document.getElementById("login-btn");
-    const logoutBtn = document.getElementById("logout-btn");
-    const userInfo = document.getElementById("user-info");
-    const userImg = document.getElementById("user-img");
-    
-    const searchInput = document.getElementById("search-input");
-    const searchBtn = document.getElementById("search-btn");
-    const resultsList = document.getElementById("results-list");
-    const singerTags = document.querySelectorAll(".singer-tag");
-    
-    const audioModeBtn = document.getElementById("audio-mode-btn");
-    const videoModeBtn = document.getElementById("video-mode-btn");
-    const screenBox = document.getElementById("screen-box");
-    const posterArt = document.getElementById("poster-art");
-    
-    // Bottom Player Elements
-    const bpTitle = document.getElementById("bp-title");
-    const bpArtist = document.getElementById("bp-artist");
-    const bpThumb = document.getElementById("bp-thumb");
-    const btnPlay = document.getElementById("btn-play");
-    const btnNext = document.getElementById("btn-next");
-    const btnPrev = document.getElementById("btn-prev");
-    
-    const tabSearch = document.getElementById("tab-search");
-    const tabFav = document.getElementById("tab-fav");
+    /* =========================
+       DOM
+       ========================= */
+    const $ = id => document.getElementById(id);
+    const loginBtn = $("login-btn");
+    const logoutBtn = $("logout-btn");
+    const userInfo = $("user-info");
+    const userImg = $("user-img");
 
-    let ytPlayer;
-    let favorites = JSON.parse(localStorage.getItem('myFavorites')) || [];
-    
-    // Playlist System Tracking
+    const searchInput = $("search-input");
+    const searchBtn = $("search-btn");
+    const resultsList = $("results-list");
+
+    const audioModeBtn = $("audio-mode-btn");
+    const videoModeBtn = $("video-mode-btn");
+    const screenBox = $("screen-box");
+    const posterArt = $("poster-art");
+    const nowPlayingSmall = $("now-playing-small");
+    const screenMessage = $("screen-message");
+    const playerStatus = $("player-status");
+
+    const bpTitle = $("bp-title");
+    const bpArtist = $("bp-artist");
+    const bpThumb = $("bp-thumb");
+    const btnPlay = $("btn-play");
+    const btnNext = $("btn-next");
+    const btnPrev = $("btn-prev");
+    const muteBtn = $("mute-btn");
+    const fullscreenBtn = $("fullscreen-btn");
+
+    const tabSearch = $("tab-search");
+    const tabFav = $("tab-fav");
+
+    /* =========================
+       STATE
+       ========================= */
+    let ytPlayer = null;
+    let ytReady = false;
+    let isPlaying = false;
+    let isMuted = false;
+    let pendingVideoId = null;
     let currentPlaylist = [];
     let currentSongIndex = 0;
-    let isPlaying = false;
+    let favorites = JSON.parse(localStorage.getItem("myFavorites") || "[]");
 
-    // --- AUTHENTICATION ---
-    loginBtn.addEventListener("click", () => signInWithPopup(auth, provider));
+    /* =========================
+       YOUTUBE IFRAME API
+       IMPORTANT FIX:
+       The callback is registered BEFORE
+       loading the YouTube API. This avoids
+       the original race-condition bug.
+       ========================= */
+    window.onYouTubeIframeAPIReady = () => {
+      ytPlayer = new YT.Player("yt-player", {
+        width: "100%",
+        height: "100%",
+        videoId: "",
+        playerVars: {
+          autoplay: 0,
+          controls: 1,
+          fs: 1,
+          playsinline: 1,
+          rel: 0,
+          modestbranding: 1,
+          enablejsapi: 1
+        },
+        events: {
+          onReady: onYouTubeReady,
+          onStateChange: onPlayerStateChange,
+          onError: onPlayerError
+        }
+      });
+    };
+
+    const ytScript = document.createElement("script");
+    ytScript.src = "https://www.youtube.com/iframe_api";
+    ytScript.async = true;
+    document.head.appendChild(ytScript);
+
+    function onYouTubeReady() {
+      ytReady = true;
+      playerStatus.textContent = "YouTube player ready.";
+      if (pendingVideoId) {
+        const id = pendingVideoId;
+        pendingVideoId = null;
+        playVideoId(id);
+      }
+    }
+
+    function onPlayerStateChange(event) {
+      if (!window.YT) return;
+
+      switch (event.data) {
+        case YT.PlayerState.PLAYING:
+          isPlaying = true;
+          btnPlay.textContent = "⏸";
+          posterArt.classList.add("spin");
+          screenMessage.classList.add("hidden");
+          playerStatus.textContent = "Playing";
+          break;
+
+        case YT.PlayerState.PAUSED:
+          isPlaying = false;
+          btnPlay.textContent = "▶";
+          posterArt.classList.remove("spin");
+          playerStatus.textContent = "Paused";
+          break;
+
+        case YT.PlayerState.BUFFERING:
+          playerStatus.textContent = "Buffering…";
+          break;
+
+        case YT.PlayerState.ENDED:
+          isPlaying = false;
+          btnPlay.textContent = "▶";
+          posterArt.classList.remove("spin");
+          playNext();
+          break;
+
+        case YT.PlayerState.CUED:
+          playerStatus.textContent = "Ready to play";
+          break;
+      }
+    }
+
+    function onPlayerError(event) {
+      isPlaying = false;
+      btnPlay.textContent = "▶";
+
+      const messages = {
+        2: "Invalid YouTube video ID.",
+        5: "This video cannot be played in this HTML5 player.",
+        100: "Video not found or private.",
+        101: "This video does not allow embedded playback.",
+        150: "This video does not allow embedded playback."
+      };
+
+      playerStatus.textContent = messages[event.data] || "YouTube playback error.";
+      screenMessage.textContent = messages[event.data] || "This video cannot be played here.";
+      screenMessage.classList.remove("hidden");
+    }
+
+    /* =========================
+       AUTH
+       ========================= */
+    loginBtn.addEventListener("click", async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        console.error(err);
+        alert("Google Login failed. Check Firebase Authentication settings.");
+      }
+    });
+
     logoutBtn.addEventListener("click", () => signOut(auth));
-    onAuthStateChanged(auth, (user) => {
+
+    onAuthStateChanged(auth, user => {
       if (user) {
         loginBtn.style.display = "none";
         userInfo.style.display = "flex";
-        userImg.src = user.photoURL || "https://via.placeholder.com/32";
+        userImg.src = user.photoURL || "https://via.placeholder.com/40";
       } else {
         loginBtn.style.display = "block";
         userInfo.style.display = "none";
       }
     });
 
-    // --- YOUTUBE PLAYER ---
-    window.onYouTubeIframeAPIReady = function () {
-      ytPlayer = new YT.Player("yt-player", {
-        height: "100%", width: "100%", videoId: "", 
-        playerVars: { 
-            autoplay: 1, 
-            controls: 1, 
-            modestbranding: 1,
-            fs: 1, // Fullscreen button enabled in video
-            playsinline: 1 
-        },
-        events: {
-            'onStateChange': onPlayerStateChange
-        }
-      });
-    };
-
-    function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING) {
-            isPlaying = true;
-            btnPlay.innerHTML = "⏸";
-            posterArt.classList.add("spin");
-        } else if (event.data == YT.PlayerState.PAUSED || event.data == YT.PlayerState.ENDED) {
-            isPlaying = false;
-            btnPlay.innerHTML = "▶";
-            posterArt.classList.remove("spin");
-            
-            // Autoplay Next Song
-            if (event.data == YT.PlayerState.ENDED) playNext();
-        }
-    }
-
-    // --- BOTTOM CONTROLS ---
-    btnPlay.addEventListener("click", () => {
-        if (!ytPlayer) return;
-        if (isPlaying) {
-            ytPlayer.pauseVideo();
-        } else {
-            ytPlayer.playVideo();
-        }
-    });
-
-    btnNext.addEventListener("click", playNext);
-    btnPrev.addEventListener("click", playPrev);
-
-    function playNext() {
-        if (currentPlaylist.length === 0) return;
-        currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
-        loadSongData(currentSongIndex);
-    }
-
-    function playPrev() {
-        if (currentPlaylist.length === 0) return;
-        currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
-        loadSongData(currentSongIndex);
-    }
-
-    // --- UI MODE TOGGLE ---
-    audioModeBtn.addEventListener("click", () => {
-      audioModeBtn.classList.add("active"); videoModeBtn.classList.remove("active");
-      screenBox.classList.add("audio-mode-active");
-    });
-    videoModeBtn.addEventListener("click", () => {
-      videoModeBtn.classList.add("active"); audioModeBtn.classList.remove("active");
-      screenBox.classList.remove("audio-mode-active");
-    });
-
-    // --- YOUTUBE API SEARCH ---
-    const YOUTUBE_API_KEY = "AIzaSyCsgzh8SGJvzEt4z7y4aJ7mHIR6NgOE3Xg"; 
-
+    /* =========================
+       SEARCH
+       ========================= */
     searchBtn.addEventListener("click", () => performSearch(searchInput.value));
-    searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") performSearch(searchInput.value); });
-    
-    singerTags.forEach(tag => {
+
+    searchInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") performSearch(searchInput.value);
+    });
+
+    document.querySelectorAll(".singer-tag").forEach(tag => {
       tag.addEventListener("click", () => {
-        searchInput.value = tag.getAttribute("data-singer");
-        performSearch(searchInput.value);
+        searchInput.value = tag.dataset.singer;
         tabSearch.click();
+        performSearch(searchInput.value);
       });
     });
 
     async function performSearch(query) {
-      if (!query.trim()) return;
-      resultsList.innerHTML = "<p style='text-align:center; color:#ff0055; font-weight:bold;'>Searching...</p>";
-      
-      const endpoint = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=15&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
+      query = query.trim();
+      if (!query) return;
+
+      resultsList.innerHTML = '<p style="text-align:center;color:#ff0055;font-weight:800">Searching…</p>';
+
+      const endpoint =
+        "https://www.googleapis.com/youtube/v3/search" +
+        "?part=snippet" +
+        "&type=video" +
+        "&videoEmbeddable=true" +
+        "&maxResults=15" +
+        "&q=" + encodeURIComponent(query) +
+        "&key=" + encodeURIComponent(YOUTUBE_API_KEY);
 
       try {
         const res = await fetch(endpoint);
         const data = await res.json();
 
-        if (!data.items || data.items.length === 0) {
-          resultsList.innerHTML = "<p style='text-align:center; color:#888;'>No songs found.</p>";
+        if (!res.ok || data.error) {
+          console.error(data);
+          resultsList.innerHTML =
+            '<p style="text-align:center;color:#ff667f">YouTube Search API error. Check API key, quota and API restrictions.</p>';
           return;
         }
 
-        // Search successful, format list for Player
-        let formattedItems = data.items.map(item => ({
+        const items = (data.items || [])
+          .filter(item => item.id && item.id.videoId)
+          .map(item => ({
             videoId: item.id.videoId,
-            title: item.snippet.title.replace(/&quot;/g, '"').replace(/&#39;/g, "'"),
+            title: decodeHtml(item.snippet.title),
             author: item.snippet.channelTitle,
-            thumb: item.snippet.thumbnails.high.url
-        })).filter(i => i.videoId); // Remove undefined (playlists/channels)
+            thumb: item.snippet.thumbnails?.high?.url ||
+                   item.snippet.thumbnails?.medium?.url ||
+                   item.snippet.thumbnails?.default?.url
+          }));
 
-        renderList(formattedItems, false);
+        if (!items.length) {
+          resultsList.innerHTML = '<p style="text-align:center;color:#888">No playable videos found.</p>';
+          return;
+        }
+
+        currentPlaylist = items;
+        currentSongIndex = 0;
+        renderList(items, false);
       } catch (err) {
-        resultsList.innerHTML = "<p style='color:red; text-align:center;'>Network Error.</p>";
+        console.error(err);
+        resultsList.innerHTML = '<p style="text-align:center;color:#ff667f">Network error. Check your internet connection.</p>';
       }
     }
 
-    // --- RENDER LIST ---
+    function decodeHtml(value) {
+      const textarea = document.createElement("textarea");
+      textarea.innerHTML = value;
+      return textarea.value;
+    }
+
+    /* =========================
+       LIST
+       ========================= */
     function renderList(items, isFavList = false) {
-      currentPlaylist = items; // Update the global playlist
+      currentPlaylist = items;
       resultsList.innerHTML = "";
-      
-      if(items.length === 0) {
-        resultsList.innerHTML = "<p style='color:#888; text-align:center;'>List is empty.</p>"; return;
+
+      if (!items.length) {
+        resultsList.innerHTML = '<p style="color:#888;text-align:center">List is empty.</p>';
+        return;
       }
-      
-      items.forEach((item, index) => {
-        const isFav = favorites.some(fav => fav.videoId === item.videoId);
+
+      items.forEach((song, index) => {
+        const loved = favorites.some(x => x.videoId === song.videoId);
 
         const card = document.createElement("div");
         card.className = "song-card";
-        card.innerHTML = `
-          <img src="${item.thumb}" alt="thumb">
-          <div class="song-meta">
-            <h4>${item.title}</h4>
-            <p>${item.author}</p>
-          </div>
-          <button class="fav-btn ${isFav ? 'loved' : ''}">${isFav ? '❤️' : '🤍'}</button>
-        `;
 
-        card.querySelector('.song-meta').addEventListener("click", () => { currentSongIndex = index; loadSongData(index); });
-        card.querySelector('img').addEventListener("click", () => { currentSongIndex = index; loadSongData(index); });
+        const img = document.createElement("img");
+        img.src = song.thumb;
+        img.alt = "Thumbnail";
+        img.loading = "lazy";
 
-        const favBtn = card.querySelector('.fav-btn');
-        favBtn.addEventListener("click", (e) => {
+        const meta = document.createElement("div");
+        meta.className = "song-meta";
+        meta.innerHTML = `<h4></h4><p></p>`;
+        meta.querySelector("h4").textContent = song.title;
+        meta.querySelector("p").textContent = song.author;
+
+        const fav = document.createElement("button");
+        fav.className = "fav-btn" + (loved ? " loved" : "");
+        fav.textContent = loved ? "❤️" : "🤍";
+        fav.title = "Favorite";
+
+        card.append(img, meta, fav);
+
+        const select = () => {
+          currentSongIndex = index;
+          loadSongData(index);
+        };
+
+        img.addEventListener("click", select);
+        meta.addEventListener("click", select);
+
+        fav.addEventListener("click", e => {
           e.stopPropagation();
-          toggleFavorite(item, favBtn);
-          if (isFavList) renderFavorites(); 
+          toggleFavorite(song, fav);
+          if (isFavList) renderFavorites();
+        });
+
+        card.addEventListener("click", e => {
+          if (e.target !== fav && e.target !== img) select();
         });
 
         resultsList.appendChild(card);
       });
     }
 
-    // --- LOAD & PLAY ---
+    /* =========================
+       PLAYBACK
+       ========================= */
     function loadSongData(index) {
-      if(!currentPlaylist[index]) return;
+      if (!currentPlaylist[index]) return;
+
       const song = currentPlaylist[index];
-      
-      // Update Bottom Player UI
-      bpTitle.innerHTML = song.title; 
-      bpArtist.innerText = song.author; 
+
+      bpTitle.textContent = song.title;
+      bpArtist.textContent = song.author;
       bpThumb.src = song.thumb;
       posterArt.src = song.thumb;
-      
-      if (ytPlayer && ytPlayer.loadVideoById) { 
-          ytPlayer.loadVideoById(song.videoId); 
-          ytPlayer.playVideo(); 
-          btnPlay.innerHTML = "⏸";
+      nowPlayingSmall.textContent = song.title;
+
+      screenMessage.classList.add("hidden");
+
+      if (!ytReady || !ytPlayer) {
+        pendingVideoId = song.videoId;
+        playerStatus.textContent = "Loading YouTube player…";
+        return;
+      }
+
+      playVideoId(song.videoId);
+    }
+
+    function playVideoId(videoId) {
+      if (!ytPlayer) return;
+
+      try {
+        ytPlayer.loadVideoById({
+          videoId,
+          startSeconds: 0
+        });
+
+        /* This call happens from a user action when the song
+           is selected or the play button is pressed. */
+        ytPlayer.unMute();
+        isMuted = false;
+        muteBtn.textContent = "🔊";
+
+        ytPlayer.playVideo();
+        playerStatus.textContent = "Starting…";
+      } catch (err) {
+        console.error(err);
+        playerStatus.textContent = "Could not start playback.";
       }
     }
 
-    // --- FAVORITES ---
-    function toggleFavorite(songObj, btnElement) {
-      const index = favorites.findIndex(fav => fav.videoId === songObj.videoId);
+    btnPlay.addEventListener("click", () => {
+      if (!ytReady || !ytPlayer) {
+        playerStatus.textContent = "YouTube player is still loading…";
+        return;
+      }
+
+      if (!currentPlaylist.length) {
+        playerStatus.textContent = "Search and select a song first.";
+        return;
+      }
+
+      if (!ytPlayer.getVideoData().video_id) {
+        loadSongData(currentSongIndex);
+        return;
+      }
+
+      try {
+        if (isPlaying) {
+          ytPlayer.pauseVideo();
+        } else {
+          /* User gesture: browser is much more likely to allow sound here. */
+          ytPlayer.unMute();
+          isMuted = false;
+          muteBtn.textContent = "🔊";
+          ytPlayer.playVideo();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    btnNext.addEventListener("click", playNext);
+    btnPrev.addEventListener("click", playPrev);
+
+    function playNext() {
+      if (!currentPlaylist.length) return;
+      currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
+      loadSongData(currentSongIndex);
+    }
+
+    function playPrev() {
+      if (!currentPlaylist.length) return;
+      currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
+      loadSongData(currentSongIndex);
+    }
+
+    /* =========================
+       AUDIO / VIDEO MODE
+       ========================= */
+    audioModeBtn.addEventListener("click", () => {
+      audioModeBtn.classList.add("active");
+      videoModeBtn.classList.remove("active");
+      screenBox.classList.remove("video-mode");
+      playerStatus.textContent = isPlaying ? "Playing in Audio Mode" : "Audio Mode";
+    });
+
+    videoModeBtn.addEventListener("click", () => {
+      videoModeBtn.classList.add("active");
+      audioModeBtn.classList.remove("active");
+      screenBox.classList.add("video-mode");
+
+      /* User clicked the mode button, so unmute/play is allowed
+         by normal browser user-gesture rules. */
+      if (ytReady && ytPlayer && ytPlayer.getVideoData().video_id) {
+        ytPlayer.unMute();
+        isMuted = false;
+        muteBtn.textContent = "🔊";
+        if (!isPlaying) ytPlayer.playVideo();
+      }
+
+      playerStatus.textContent = isPlaying ? "Playing in Video Mode" : "Video Mode";
+    });
+
+    /* =========================
+       SOUND
+       ========================= */
+    muteBtn.addEventListener("click", () => {
+      if (!ytReady || !ytPlayer) return;
+
+      if (isMuted) {
+        ytPlayer.unMute();
+        isMuted = false;
+        muteBtn.textContent = "🔊";
+      } else {
+        ytPlayer.mute();
+        isMuted = true;
+        muteBtn.textContent = "🔇";
+      }
+    });
+
+    /* =========================
+       FULLSCREEN
+       ========================= */
+    fullscreenBtn.addEventListener("click", async () => {
+      if (!ytReady || !ytPlayer) return;
+
+      const iframe = ytPlayer.getIframe();
+
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+          return;
+        }
+
+        if (iframe && iframe.requestFullscreen) {
+          await iframe.requestFullscreen();
+          return;
+        }
+
+        if (screenBox.requestFullscreen) {
+          await screenBox.requestFullscreen();
+        }
+      } catch (err) {
+        console.warn("Fullscreen request failed:", err);
+        playerStatus.textContent = "Use YouTube's fullscreen button inside the video.";
+      }
+    });
+
+    /* =========================
+       FAVORITES
+       ========================= */
+    function toggleFavorite(song, button) {
+      const index = favorites.findIndex(x => x.videoId === song.videoId);
+
       if (index === -1) {
-        favorites.push(songObj);
-        btnElement.classList.add('loved'); btnElement.innerText = '❤️';
+        favorites.push(song);
+        button.classList.add("loved");
+        button.textContent = "❤️";
       } else {
         favorites.splice(index, 1);
-        btnElement.classList.remove('loved'); btnElement.innerText = '🤍';
+        button.classList.remove("loved");
+        button.textContent = "🤍";
       }
-      localStorage.setItem('myFavorites', JSON.stringify(favorites));
+
+      localStorage.setItem("myFavorites", JSON.stringify(favorites));
     }
 
     tabSearch.addEventListener("click", () => {
-      tabSearch.classList.add("active"); tabFav.classList.remove("active");
-      if(searchInput.value) performSearch(searchInput.value);
-      else resultsList.innerHTML = "<p style='color: #666; text-align: center;'>Search for a song to begin.</p>";
+      tabSearch.classList.add("active");
+      tabFav.classList.remove("active");
+
+      if (searchInput.value.trim()) {
+        performSearch(searchInput.value);
+      } else {
+        resultsList.innerHTML = '<p style="color:#666;text-align:center">Search for a song to begin.</p>';
+      }
     });
 
-    tabFav.addEventListener("click", () => renderFavorites());
+    tabFav.addEventListener("click", renderFavorites);
 
     function renderFavorites() {
-      tabFav.classList.add("active"); tabSearch.classList.remove("active");
+      tabFav.classList.add("active");
+      tabSearch.classList.remove("active");
       renderList(favorites, true);
     }
 
-    // --- PWA LOGIC ---
+    /* =========================
+       PWA
+       ========================= */
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./service-worker.js");
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(err => {
+          console.warn("Service worker not registered:", err);
+        });
+      });
     }
-    let deferredPrompt;
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault(); deferredPrompt = e;
-      document.getElementById("pwa-install-btn").style.display = "block";
+
+    let deferredPrompt = null;
+    const installBtn = $("pwa-install-btn");
+
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = "block";
     });
-    document.getElementById("pwa-install-btn").addEventListener("click", () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById("pwa-install-btn").style.display = "none"; });
-      }
+
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.style.display = "none";
     });
   </script>
 </body>
