@@ -385,15 +385,26 @@
     function onYouTubeReady() {
       ytReady = true;
       playerStatus.textContent = "YouTube player ready.";
+      
+      // 🔴 Media Session Event Listeners 🔴
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', () => {
+          if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo();
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+          if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+        });
+        navigator.mediaSession.setActionHandler('previoustrack', playPrev);
+        navigator.mediaSession.setActionHandler('nexttrack', playNext);
+      }
+
       if (pendingVideoId) {
         const id = pendingVideoId;
         pendingVideoId = null;
         try {
           ytPlayer.cueVideoById(id);
           playerStatus.textContent = "Restored. Press Play to continue.";
-        } catch (e) {
-          console.warn(e);
-        }
+        } catch (e) {}
       } else {
         restorePlayerState();
         if (pendingVideoId) {
@@ -457,8 +468,7 @@
       try {
         await signInWithPopup(auth, provider);
       } catch (err) {
-        console.error(err);
-        alert("Google Login failed. Check Firebase Authentication settings.");
+        alert("Google Login failed.");
       }
     });
 
@@ -508,7 +518,7 @@
         const data = await res.json();
 
         if (!res.ok || data.error) {
-          resultsList.innerHTML = '<p style="text-align:center;color:#ff667f">YouTube Search API error. Check API key, quota and API restrictions.</p>';
+          resultsList.innerHTML = '<p style="text-align:center;color:#ff667f">YouTube Search API error. Check API key.</p>';
           return;
         }
 
@@ -532,8 +542,7 @@
         currentSongIndex = 0;
         renderList(items, false);
       } catch (err) {
-        console.error(err);
-        resultsList.innerHTML = '<p style="text-align:center;color:#ff667f">Network error. Check your internet connection.</p>';
+        resultsList.innerHTML = '<p style="text-align:center;color:#ff667f">Network error.</p>';
       }
     }
 
@@ -608,6 +617,16 @@
       nowPlayingSmall.textContent = song.title;
       screenMessage.classList.add("hidden");
 
+      // 🔴 Set Media Session Info for Lock Screen 🔴
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: song.title,
+          artist: song.author,
+          album: 'Prasoon Music',
+          artwork: [{ src: song.thumb, sizes: '512x512', type: 'image/jpeg' }]
+        });
+      }
+
       if (!ytReady || !ytPlayer) {
         pendingVideoId = song.videoId;
         playerStatus.textContent = "Loading YouTube player…";
@@ -625,21 +644,12 @@
         muteBtn.textContent = "🔊";
         ytPlayer.playVideo();
         playerStatus.textContent = "Starting…";
-      } catch (err) {
-        console.error(err);
-        playerStatus.textContent = "Could not start playback.";
-      }
+      } catch (err) {}
     }
 
     btnPlay.addEventListener("click", () => {
-      if (!ytReady || !ytPlayer) {
-        playerStatus.textContent = "YouTube player is still loading…";
-        return;
-      }
-      if (!currentPlaylist.length) {
-        playerStatus.textContent = "Search and select a song first.";
-        return;
-      }
+      if (!ytReady || !ytPlayer) return;
+      if (!currentPlaylist.length) return;
       if (!ytPlayer.getVideoData().video_id) {
         loadSongData(currentSongIndex);
         return;
@@ -653,9 +663,7 @@
           muteBtn.textContent = "🔊";
           ytPlayer.playVideo();
         }
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) {}
     });
 
     btnNext.addEventListener("click", playNext);
@@ -677,7 +685,6 @@
       audioModeBtn.classList.add("active");
       videoModeBtn.classList.remove("active");
       screenBox.classList.remove("video-mode");
-      playerStatus.textContent = isPlaying ? "Playing in Audio Mode" : "Audio Mode";
       savePlayerState();
     });
 
@@ -691,7 +698,6 @@
         muteBtn.textContent = "🔊";
         if (!isPlaying) ytPlayer.playVideo();
       }
-      playerStatus.textContent = isPlaying ? "Playing in Video Mode" : "Video Mode";
       savePlayerState();
     });
 
@@ -727,9 +733,7 @@
         if (screenBox.requestFullscreen) {
           await screenBox.requestFullscreen();
         }
-      } catch (err) {
-        console.warn("Fullscreen request failed:", err);
-      }
+      } catch (err) {}
     });
 
     function toggleFavorite(song, button) {
