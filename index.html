@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ff0055">
   <style>
-    /* --- MOBILE-FIRST CSS SECTION --- */
+    /* --- MOBILE-FIRST CSS --- */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
     body { background-color: #0f0f12; color: #ffffff; padding-bottom: 70px; }
     
@@ -61,7 +61,6 @@
 </head>
 <body>
 
-  <!-- HTML SECTION -->
   <header>
     <div class="logo">⚡ Prasoon Music</div>
     <div>
@@ -123,12 +122,10 @@
 
   <script src="https://www.youtube.com/iframe_api"></script>
 
-  <!-- JAVASCRIPT SECTION -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
-    // Firebase Config 
     const firebaseConfig = {
       apiKey: "AIzaSyDwiKbKcpckYDsZfT35E8LvVmhRbrOIczQ",
       authDomain: "prasoon-song.firebaseapp.com",
@@ -143,7 +140,6 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // DOM Elements
     const loginBtn = document.getElementById("login-btn");
     const logoutBtn = document.getElementById("logout-btn");
     const userInfo = document.getElementById("user-info");
@@ -168,7 +164,6 @@
     let ytPlayer;
     let favorites = JSON.parse(localStorage.getItem('myFavorites')) || [];
 
-    // Login Logic
     loginBtn.addEventListener("click", () => signInWithPopup(auth, provider));
     logoutBtn.addEventListener("click", () => signOut(auth));
     onAuthStateChanged(auth, (user) => {
@@ -182,7 +177,6 @@
       }
     });
 
-    // YouTube Player Logic
     window.onYouTubeIframeAPIReady = function () {
       ytPlayer = new YT.Player("yt-player", {
         height: "100%", width: "100%", videoId: "jfKfPfyJRdk", 
@@ -190,7 +184,6 @@
       });
     };
 
-    // Mode Toggle
     audioModeBtn.addEventListener("click", () => {
       audioModeBtn.classList.add("active"); videoModeBtn.classList.remove("active");
       videoWrapper.style.display = "none"; audioWrapper.style.display = "flex";
@@ -200,7 +193,6 @@
       videoWrapper.style.display = "block"; audioWrapper.style.display = "none";
     });
 
-    // Fast Search Logic using Piped API
     searchBtn.addEventListener("click", () => performSearch(searchInput.value));
     searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") performSearch(searchInput.value); });
     
@@ -212,29 +204,52 @@
       });
     });
 
+    // 🔴 NEW ROBUST SEARCH SYSTEM (Multiple Servers)
     async function performSearch(query) {
       if (!query.trim()) return;
-      resultsList.innerHTML = "<p style='text-align:center; color:#bbb;'>Searching...</p>";
-      try {
-        // Switched to faster, stable Piped API
-        const res = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=videos`);
-        const data = await res.json();
-        
-        if (!data.items || data.items.length === 0) {
-          resultsList.innerHTML = "<p style='text-align:center; color:#888;'>No songs found.</p>";
-          return;
+      resultsList.innerHTML = "<p style='text-align:center; color:#ff0055; font-weight:bold;'>Searching servers...</p>";
+      
+      // List of 5 different backup servers
+      const urls = [
+        `https://pipedapi.smnz.de/search?q=${encodeURIComponent(query)}&filter=videos`,
+        `https://pipedapi.tokhmi.xyz/search?q=${encodeURIComponent(query)}&filter=videos`,
+        `https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=videos`,
+        `https://invidious.nerdvpn.de/api/v1/search?q=${encodeURIComponent(query)}&type=video`,
+        `https://inv.tux.pizza/api/v1/search?q=${encodeURIComponent(query)}&type=video`
+      ];
+
+      for (let url of urls) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue; 
+          
+          const data = await res.json();
+          let items = [];
+          let isPiped = url.includes("piped");
+
+          if (isPiped && data.items && data.items.length > 0) {
+             items = data.items;
+          } else if (!isPiped && data.length > 0) {
+             items = data;
+          }
+
+          if (items.length > 0) {
+            renderList(items.slice(0, 10), false, isPiped);
+            return; // ✅ Success! Stop checking other servers
+          }
+        } catch (err) {
+          console.log("Server skipped:", url);
         }
-        renderList(data.items.slice(0, 10), false, true); 
-      } catch (err) {
-        resultsList.innerHTML = "<p style='color:red; text-align:center;'>Data failed to load. Please try again.</p>";
       }
+
+      // If all 5 servers are down
+      resultsList.innerHTML = "<p style='color:red; text-align:center;'>All free servers are currently busy. Try again in a minute!</p>";
     }
 
-    // Render Songs
     function renderList(items, isFavList = false, isPipedData = false) {
       resultsList.innerHTML = "";
       if(items.length === 0) {
-        resultsList.innerHTML = "<p style='color:#888; text-align:center;'>List is empty.</p>"; return;
+        resultsList.innerHTML = "<p style='color:#888; text-align:center;'>No songs found.</p>"; return;
       }
       
       items.forEach((item) => {
@@ -249,7 +264,7 @@
           videoId = item.videoId;
           title = item.title;
           author = item.author;
-          thumb = item.thumb;
+          thumb = item.videoThumbnails ? item.videoThumbnails[0].url : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
         }
         
         const isFav = favorites.some(fav => fav.videoId === videoId);
@@ -284,7 +299,6 @@
       if (ytPlayer && ytPlayer.loadVideoById) { ytPlayer.loadVideoById(videoId); ytPlayer.playVideo(); }
     }
 
-    // Favorites Logic
     function toggleFavorite(videoId, title, author, thumb, btnElement) {
       const index = favorites.findIndex(fav => fav.videoId === videoId);
       if (index === -1) {
@@ -297,7 +311,6 @@
       localStorage.setItem('myFavorites', JSON.stringify(favorites));
     }
 
-    // Tabs
     tabSearch.addEventListener("click", () => {
       tabSearch.classList.add("active"); tabFav.classList.remove("active");
       if(searchInput.value) performSearch(searchInput.value);
@@ -311,7 +324,6 @@
       renderList(favorites, true, false);
     }
 
-    // PWA Logic
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./service-worker.js");
     }
