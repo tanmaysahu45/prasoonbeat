@@ -8,15 +8,20 @@
   <link rel="manifest" href="./manifest.json">
   
   <style>
-    /* ================== BASE STYLES ================== */
+    /* =========================================================
+       1. BASE STYLES & RESET (Spotify Dark Theme)
+       ========================================================= */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     :root { --accent: #1db954; --bg: #000000; --panel: #121212; --panel-hover: #282828; --text: #ffffff; --muted: #a7a7a7; --border: #2a2a2a; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px; overflow-x: hidden; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 120px; overflow-x: hidden; }
     button, input { font: inherit; outline: none; border: none; }
     button { cursor: pointer; }
 
-    /* ================== HEADER ================== */
+    /* =========================================================
+       2. HEADER & AUTHENTICATION
+       ========================================================= */
     header { position: sticky; top: 0; z-index: 100; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
     .logo { font-weight: 800; font-size: 18px; color: var(--text); display: flex; align-items: center; gap: 6px; }
     .logo span { color: var(--accent); }
@@ -25,60 +30,79 @@
     .user-profile { display: none; align-items: center; gap: 10px; }
     .user-profile img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
 
-    /* ================== SEARCH & TAGS ================== */
+    /* =========================================================
+       3. SEARCH BAR & QUICK TAGS
+       ========================================================= */
     .search-container { padding: 12px 16px; }
     .search-box { display: flex; background: var(--panel-hover); border-radius: 24px; padding: 4px; border: 1px solid transparent; transition: 0.2s; }
     .search-box:focus-within { border-color: var(--muted); background: var(--panel); }
     .search-box input { flex: 1; background: transparent; color: var(--text); padding: 10px 14px; font-size: 14px; }
     .search-box button { background: var(--text); color: var(--bg); border-radius: 20px; padding: 8px 18px; font-weight: 600; font-size: 13px; }
+    
     .tags-wrapper { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 12px; scrollbar-width: none; }
     .tags-wrapper::-webkit-scrollbar { display: none; }
-    .tag { background: var(--panel); color: var(--text); padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 600; white-space: nowrap; border: 1px solid var(--border); }
+    .tag { background: var(--panel); color: var(--text); padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 600; white-space: nowrap; border: 1px solid var(--border); transition: 0.2s; }
+    .tag:active { background: var(--panel-hover); transform: scale(0.95); }
 
-    /* ================== TABS & LIST ================== */
+    /* =========================================================
+       4. TABS & RESULTS LIST
+       ========================================================= */
     .tabs { display: flex; gap: 16px; padding: 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-    .tab { background: transparent; color: var(--muted); padding: 8px 0; font-weight: 600; font-size: 14px; border-bottom: 2px solid transparent; }
+    .tab { background: transparent; color: var(--muted); padding: 8px 0; font-weight: 600; font-size: 14px; border-bottom: 2px solid transparent; transition: 0.2s; }
     .tab.active { color: var(--text); border-bottom-color: var(--accent); }
 
     .song-list { padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
     .song-card { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 6px; transition: 0.2s; }
     .song-card:active { background: var(--panel); transform: scale(0.98); }
     .song-card img { width: 48px; height: 48px; border-radius: 4px; object-fit: cover; background: var(--panel); }
-    .song-info { flex: 1; min-width: 0; }
+    .song-info { flex: 1; min-width: 0; cursor: pointer; }
     .song-info h4 { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
     .song-info p { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .fav-btn { background: transparent; font-size: 18px; color: var(--muted); padding: 8px; }
-    .fav-btn.active { color: var(--accent); }
+    
+    .fav-btn { background: transparent; font-size: 18px; color: var(--muted); padding: 8px; transition: 0.2s; }
+    .fav-btn.active { color: var(--accent); transform: scale(1.1); }
 
-    /* ================== MINI PLAYER ================== */
+    /* =========================================================
+       5. BOTTOM MINI PLAYER
+       ========================================================= */
     .mini-player { position: fixed; bottom: 8px; left: 8px; right: 8px; background: var(--panel-hover); border-radius: 8px; padding: 8px; display: none; align-items: center; gap: 10px; z-index: 900; border: 1px solid var(--border); box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
     .mini-player img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
     .mini-info { flex: 1; min-width: 0; cursor: pointer; }
     .mini-info h4 { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mini-info p { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mini-controls { display: flex; align-items: center; gap: 8px; }
-    .ctrl-btn { background: transparent; color: var(--text); font-size: 20px; padding: 4px; }
-    .play-btn { width: 32px; height: 32px; background: var(--text); color: var(--bg); border-radius: 50%; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .ctrl-btn { background: transparent; color: var(--text); font-size: 20px; padding: 4px; transition: 0.2s; }
+    .ctrl-btn:active { transform: scale(0.8); }
+    .play-btn { width: 32px; height: 32px; background: var(--text); color: var(--bg); border-radius: 50%; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .play-btn:active { transform: scale(0.9); }
 
-    /* ================== FULL PLAYER ================== */
-    .full-player { position: fixed; inset: 0; background: linear-gradient(to bottom, #2b2b2b, #000000 80%); z-index: 1000; display: flex; flex-direction: column; padding: 20px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1); opacity: 0; pointer-events: none; }
-    .full-player.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    /* =========================================================
+       6. FULL EXPANDED PLAYER
+       ========================================================= */
+    .full-player { position: fixed; inset: 0; background: linear-gradient(to bottom, #2b2b2b, #000000 80%); z-index: 1000; display: flex; flex-direction: column; padding: 20px; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.2,0.8,0.2,1); }
+    .full-player.open { transform: translateY(0); }
+    
     .fp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .fp-down { background: transparent; color: var(--text); font-size: 24px; padding: 5px; }
     .fp-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--text); }
 
-    /* MEDIA CONTAINER & FIX FOR VIDEO CROPPING */
+    /* MEDIA CONTAINER (PERFECT 16:9 VIDEO FIX) */
     .media-container { width: 100%; max-width: 350px; margin: 0 auto; aspect-ratio: 1/1; border-radius: 8px; background: #000; position: relative; overflow: hidden; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .audio-view { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #181818; z-index: 2; transition: opacity 0.2s; }
+    
+    .audio-view { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #181818; z-index: 2; transition: opacity 0.3s; }
     .audio-view img { width: 100%; height: 100%; object-fit: cover; }
+    
+    /* Yaha video crop nahi hoga, balki 1:1 box ke center me fit hoga */
     .video-view { position: absolute; width: 100%; aspect-ratio: 16/9; top: 50%; transform: translateY(-50%); z-index: 1; background: #000; }
     #yt-player, iframe { width: 100% !important; height: 100% !important; border: none; }
     .video-active .audio-view { opacity: 0; pointer-events: none; }
+    
     .media-actions { position: absolute; top: 8px; right: 8px; z-index: 5; display: flex; gap: 6px; }
-    .action-btn { background: rgba(0, 0, 0, 0.6); border-radius: 50%; width: 32px; height: 32px; color: white; backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; font-size: 14px;}
+    .action-btn { background: rgba(0, 0, 0, 0.6); border-radius: 50%; width: 32px; height: 32px; color: white; backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s; }
+    .action-btn:active { transform: scale(0.85); }
 
     .mode-switch { display: flex; background: rgba(255, 255, 255, 0.1); border-radius: 20px; width: fit-content; margin: 0 auto 20px; padding: 4px; }
-    .mode-btn { padding: 6px 16px; border-radius: 16px; font-size: 12px; font-weight: 600; color: var(--muted); background: transparent; }
+    .mode-btn { padding: 6px 16px; border-radius: 16px; font-size: 12px; font-weight: 600; color: var(--muted); background: transparent; transition: 0.2s; }
     .mode-btn.active { background: var(--text); color: var(--bg); }
 
     .fp-details { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -86,25 +110,40 @@
     .fp-text h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .fp-text p { font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
-    .main-controls { display: flex; align-items: center; justify-content: center; gap: 24px; }
-    .main-ctrl-btn { font-size: 28px; color: var(--text); background: transparent; }
-    .main-play-btn { width: 64px; height: 64px; background: var(--text); color: var(--bg); border-radius: 50%; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
-    .status-text { text-align: center; font-size: 11px; color: var(--muted); margin-top: 20px; }
+    .main-controls { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 10px; }
+    .main-ctrl-btn { font-size: 28px; color: var(--text); background: transparent; transition: 0.2s; }
+    .main-ctrl-btn:active { transform: scale(0.85); }
+    .main-play-btn { width: 64px; height: 64px; background: var(--text); color: var(--bg); border-radius: 50%; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(0,0,0,0.3); transition: 0.2s; }
+    .main-play-btn:active { transform: scale(0.9); }
+    
+    .status-text { text-align: center; font-size: 11px; color: var(--muted); margin-top: 25px; }
 
-    /* ================== SETTINGS MENU ================== */
+    /* =========================================================
+       7. SETTINGS FAB & OPTIONS SHEET
+       ========================================================= */
     .options-fab { position: fixed; right: 16px; bottom: 70px; z-index: 850; width: 44px; height: 44px; border-radius: 50%; background: var(--panel-hover); color: var(--text); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.2s; }
     .options-fab:active { transform: scale(0.9); }
+    
     .options-sheet { position: fixed; left: 50%; bottom: 0; z-index: 1200; width: min(94%, 520px); transform: translate(-50%, 110%); opacity: 0; pointer-events: none; background: #181820; border: 1px solid var(--border); border-bottom: 0; border-radius: 24px 24px 0 0; padding: 18px; box-shadow: 0 -20px 50px rgba(0,0,0,0.7); transition: 0.3s; }
     .options-sheet.open { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
     .options-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .close-options { width: 32px; height: 32px; border-radius: 50%; background: transparent; color: var(--text); border: 1px solid var(--border); }
+    
     .option-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 14px 2px; border-top: 1px solid var(--border); cursor: pointer; }
     .option-row span { display: flex; flex-direction: column; gap: 3px; }
     .option-row small { color: var(--muted); font-size: 11px; }
+    
     .option-row input { appearance: none; width: 48px; height: 27px; border-radius: 30px; background: #33333d; border: 1px solid #444; position: relative; transition: 0.2s; flex: none; }
     .option-row input:before { content: ""; position: absolute; width: 21px; height: 21px; left: 2px; top: 2px; border-radius: 50%; background: #fff; transition: 0.2s; }
     .option-row input:checked { background: var(--accent); border-color: var(--accent); }
     .option-row input:checked:before { transform: translateX(21px); }
+    
+    .install-now { width: 100%; margin-top: 14px; padding: 12px; border-radius: 999px; background: var(--accent); color: var(--bg); font-weight: 800; border: none; transition: 0.2s; }
+    .install-now:active { transform: scale(0.95); }
+    
+    /* PWA Install Banner */
+    .install-banner { display: none; position: fixed; z-index: 1100; bottom: 85px; left: 50%; transform: translateX(-50%); border: 1px solid var(--accent); background: var(--accent); color: var(--bg); padding: 12px 30px; border-radius: 999px; font-weight: 800; box-shadow: 0 5px 20px rgba(29, 185, 84, 0.4); cursor: pointer; transition: 0.2s; }
+    .install-banner:active { transform: translateX(-50%) scale(0.95); }
   </style>
 </head>
 <body>
@@ -131,11 +170,14 @@
       <button id="search-btn">Search</button>
     </div>
   </div>
+  
   <div class="tags-wrapper">
     <button class="tag">Arijit Singh</button>
     <button class="tag">Shreya Ghoshal</button>
     <button class="tag">Atif Aslam</button>
     <button class="tag">The Weeknd</button>
+    <button class="tag">Badshah</button>
+    <button class="tag">Jubin Nautiyal</button>
   </div>
 
   <!-- TABS -->
@@ -148,12 +190,12 @@
     <p style="color:var(--muted);text-align:center;margin-top:20px;font-size:13px">Search for a song to start listening.</p>
   </div>
 
-  <!-- MINI PLAYER -->
+  <!-- MINI PLAYER (Fixed at bottom) -->
   <div class="mini-player" id="mini-player">
     <img id="mini-thumb" src="" alt="Thumb">
     <div class="mini-info" id="mini-open">
-      <h4 id="mini-title">Song</h4>
-      <p id="mini-artist">Artist</p>
+      <h4 id="mini-title">Song Title</h4>
+      <p id="mini-artist">Artist Name</p>
     </div>
     <div class="mini-controls">
       <button class="ctrl-btn" id="mini-prev">⏮</button>
@@ -162,63 +204,86 @@
     </div>
   </div>
 
-  <!-- FULL PLAYER -->
+  <!-- FULL EXPANDED PLAYER -->
   <div class="full-player" id="full-player">
     <div class="fp-header">
-      <button class="fp-down" id="fp-close">⌄</button>
+      <button class="fp-down" id="fp-close" title="Minimize">⌄</button>
       <div class="fp-title">Now Playing</div>
       <div style="width:24px"></div>
     </div>
 
+    <!-- Toggle between Audio and Video -->
     <div class="mode-switch">
       <button class="mode-btn active" id="mode-audio">Audio</button>
       <button class="mode-btn" id="mode-video">Video</button>
     </div>
 
     <div class="media-container" id="media-container">
-      <div class="audio-view"><img id="fp-thumb" src="" alt="Art"></div>
+      <div class="audio-view"><img id="fp-thumb" src="" alt="Album Art"></div>
+      
+      <!-- Video will render here perfectly without cropping -->
       <div class="video-view"><div id="yt-player"></div></div>
+      
       <div class="media-actions">
-        <button class="action-btn" id="mute-btn">🔊</button>
-        <button class="action-btn" id="fs-btn">⛶</button>
+        <button class="action-btn" id="mute-btn" title="Mute/Unmute">🔊</button>
+        <button class="action-btn" id="fs-btn" title="Fullscreen">⛶</button>
       </div>
     </div>
 
     <div class="fp-details">
       <div class="fp-text">
-        <h2 id="fp-title">Song</h2>
-        <p id="fp-artist">Artist</p>
+        <h2 id="fp-title">Song Title</h2>
+        <p id="fp-artist">Artist Name</p>
       </div>
-      <button class="fav-btn" id="fp-fav-btn">🤍</button>
+      <button class="fav-btn" id="fp-fav-btn" title="Like Song">🤍</button>
     </div>
 
+    <!-- Main Controls -->
     <div class="main-controls">
-      <button class="main-ctrl-btn" id="fp-prev">⏮</button>
-      <button class="main-play-btn" id="fp-play">▶</button>
-      <button class="main-ctrl-btn" id="fp-next">⏭</button>
+      <button class="main-ctrl-btn" id="fp-prev" title="Previous">⏮</button>
+      <button class="main-play-btn" id="fp-play" title="Play/Pause">▶</button>
+      <button class="main-ctrl-btn" id="fp-next" title="Next">⏭</button>
     </div>
-    <div class="status-text" id="player-status">Player is ready</div>
+    
+    <div class="status-text" id="player-status">Player is preparing...</div>
   </div>
 
-  <!-- SETTINGS -->
-  <button class="options-fab" id="options-fab">⚙️</button>
+  <!-- SETTINGS OPTIONS SHEET -->
+  <button class="options-fab" id="options-fab" title="Settings">⚙️</button>
   <div class="options-sheet" id="options-sheet">
     <div class="options-head">
-      <strong>Settings</strong>
+      <strong>Player Settings</strong>
       <button id="close-options" class="close-options">✕</button>
     </div>
+    
     <label class="option-row">
       <span><b>🔄 Auto Restore</b><small>Keep session after refresh</small></span>
       <input id="restore-toggle" type="checkbox" checked>
     </label>
+    
+    <label class="option-row">
+      <span><b>🔊 Remember Volume</b><small>Mute/unmute preference saves</small></span>
+      <input id="volume-toggle" type="checkbox" checked>
+    </label>
+    
+    <button id="install-now" class="install-now">📲 Install App</button>
+    <p style="color:var(--muted); font-size:11px; text-align:center; margin-top:10px;">Music continues playing in background.</p>
   </div>
 
-  <!-- JAVASCRIPT LOGIC (Fully Restored & Bug Free) -->
+  <!-- PWA INSTALL BANNER -->
+  <div class="install-banner" id="pwa-install-btn">📲 Install App</div>
+
+
+  <!-- =========================================================
+       ROBUST JAVASCRIPT LOGIC (Fully Detailed, No Minification)
+       ========================================================= -->
   <script type="module">
+    // 1. FIREBASE IMPORTS
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
+    // 2. CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyDwiKbKcpckYDsZfT35E8LvVmhRbrOIczQ",
       authDomain: "prasoon-song.firebaseapp.com",
@@ -229,13 +294,21 @@
     };
     const YOUTUBE_API_KEY = "AIzaSyCsgzh8SGJvzEt4z7y4aJ7mHIR6NgOE3Xg";
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    const $ = id => document.getElementById(id);
+    // 3. SAFE DOM SELECTOR HELPER
+    const getEl = id => document.getElementById(id);
+    const addSafeEvent = (id, event, handler) => {
+      const el = getEl(id);
+      if (el) el.addEventListener(event, handler);
+      else console.warn(`Element with id '${id}' not found! Skipping event.`);
+    };
     
+    // 4. GLOBAL STATE VARIABLES
     let ytPlayer = null;
     let ytReady = false;
     let currentUser = null;
@@ -245,85 +318,140 @@
     let unsubFavs = null;
     let isMuted = false;
     
-    try { favorites = JSON.parse(localStorage.getItem("pm_favs") || "[]"); } catch(e) {}
+    // Load local favorites safely as fallback
+    try { 
+      favorites = JSON.parse(localStorage.getItem("pm_favs") || "[]"); 
+    } catch(e) { console.error("Error reading local favorites."); }
     
-    // SETTINGS PANEL
-    $("options-fab").onclick = () => $("options-sheet").classList.add("open");
-    $("close-options").onclick = () => $("options-sheet").classList.remove("open");
+    // 5. SETTINGS PANEL LOGIC
+    addSafeEvent("options-fab", "click", () => getEl("options-sheet").classList.add("open"));
+    addSafeEvent("close-options", "click", () => getEl("options-sheet").classList.remove("open"));
 
-    const restoreToggle = $("restore-toggle");
-    if (localStorage.getItem("pm_restore") !== null) {
+    const restoreToggle = getEl("restore-toggle");
+    const volumeToggle = getEl("volume-toggle");
+    
+    if (restoreToggle && localStorage.getItem("pm_restore") !== null) {
       restoreToggle.checked = (localStorage.getItem("pm_restore") === "1");
     }
-    restoreToggle.addEventListener("change", () => {
-      localStorage.setItem("pm_restore", restoreToggle.checked ? "1" : "0");
-    });
+    if (volumeToggle && localStorage.getItem("pm_volume") !== null) {
+      volumeToggle.checked = (localStorage.getItem("pm_volume") === "1");
+    }
 
-    // FIREBASE CROSS-DEVICE SYNC
+    if (restoreToggle) {
+      restoreToggle.addEventListener("change", () => {
+        localStorage.setItem("pm_restore", restoreToggle.checked ? "1" : "0");
+      });
+    }
+    if (volumeToggle) {
+      volumeToggle.addEventListener("change", () => {
+        localStorage.setItem("pm_volume", volumeToggle.checked ? "1" : "0");
+      });
+    }
+
+    // 6. FIREBASE AUTH & CROSS-DEVICE SYNC LOGIC
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        $('login-btn').style.display = "none";
-        $('user-info').style.display = "flex";
-        $('user-img').src = user.photoURL || "https://via.placeholder.com/30";
+        getEl('login-btn').style.display = "none";
+        getEl('user-info').style.display = "flex";
+        getEl('user-img').src = user.photoURL || "https://via.placeholder.com/30";
         
         const userRef = doc(db, "users", user.uid);
+        
+        // Fetch Cloud Data & Merge with Local Data
         try {
           const docSnap = await getDoc(userRef);
           let cloudFavs = [];
-          if (docSnap.exists() && docSnap.data().favorites) cloudFavs = docSnap.data().favorites;
+          if (docSnap.exists() && docSnap.data().favorites) {
+             cloudFavs = docSnap.data().favorites;
+          }
           
           const mergedFavs = [...cloudFavs];
           favorites.forEach(localFav => {
-            if (!mergedFavs.find(f => f.videoId === localFav.videoId)) mergedFavs.push(localFav);
+            if (!mergedFavs.find(f => f.videoId === localFav.videoId)) {
+              mergedFavs.push(localFav);
+            }
           });
           favorites = mergedFavs;
           localStorage.setItem("pm_favs", JSON.stringify(favorites));
+          
+          // Save merged data back to cloud
           await setDoc(userRef, { favorites }, { merge: true });
-        } catch(err) { console.log(err); }
+        } catch(err) { console.error("Firebase Sync Error", err); }
 
+        // Live Listener to sync across devices in real-time
         unsubFavs = onSnapshot(userRef, (snap) => {
           if (snap.exists() && snap.data().favorites) {
             favorites = snap.data().favorites;
             localStorage.setItem("pm_favs", JSON.stringify(favorites));
           }
-          if ($('tab-fav').classList.contains('active')) renderFavs();
+          if (getEl('tab-fav').classList.contains('active')) {
+             renderFavs();
+          }
           updateFavBtnUI();
         });
         
       } else {
         currentUser = null;
         if(unsubFavs) unsubFavs();
-        $('login-btn').style.display = "block";
-        $('user-info').style.display = "none";
+        getEl('login-btn').style.display = "block";
+        getEl('user-info').style.display = "none";
       }
     });
 
-    $('login-btn').onclick = () => signInWithPopup(auth, provider).catch(e=>console.log(e));
-    $('logout-btn').onclick = () => signOut(auth);
+    addSafeEvent('login-btn', 'click', () => signInWithPopup(auth, provider).catch(e => console.error(e)));
+    addSafeEvent('logout-btn', 'click', () => signOut(auth));
 
-    // YOUTUBE API INIT
+    // 7. YOUTUBE API SETUP
     window.onYouTubeIframeAPIReady = () => {
       ytPlayer = new YT.Player("yt-player", {
-        playerVars: { autoplay: 0, controls: 1, playsinline: 1, modestbranding: 1 },
+        playerVars: { 
+          autoplay: 0, 
+          controls: 1, 
+          playsinline: 1, 
+          modestbranding: 1,
+          rel: 0 
+        },
         events: {
-          onReady: () => { ytReady = true; restoreState(); setupMediaSession(); },
-          onStateChange: onPlayerStateChange
+          onReady: () => { 
+            ytReady = true; 
+            restoreState(); 
+            setupMediaSession(); 
+            getEl('player-status').innerText = "Ready to play.";
+          },
+          onStateChange: onPlayerStateChange,
+          onError: (e) => {
+             getEl('player-status').innerText = "Playback Error.";
+             console.error("YT Error", e);
+          }
         }
       });
     };
-    document.head.appendChild(Object.assign(document.createElement("script"), {src: "https://www.youtube.com/iframe_api"}));
+    
+    // Inject the YouTube Script Dynamically
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
 
+    // Background Audio Wakelock Setup
+    const wakeAudio = () => {
+      const bgAudio = getEl('silent-audio');
+      if(bgAudio) bgAudio.play().catch(()=>{});
+    };
+    document.body.addEventListener('click', wakeAudio, {once:true});
+    document.body.addEventListener('touchstart', wakeAudio, {once:true});
+
+    // 8. PLAYER STATE & PLAYBACK LOGIC
     function onPlayerStateChange(event) {
       if (event.data === YT.PlayerState.PLAYING) {
-        $('mini-play').innerText = "⏸";
-        $('fp-play').innerText = "⏸";
-        $('silent-audio').play().catch(()=>{}); 
-        $('player-status').innerText = "Playing";
+        getEl('mini-play').innerText = "⏸";
+        getEl('fp-play').innerText = "⏸";
+        wakeAudio(); 
+        getEl('player-status').innerText = "Playing in background...";
       } else if (event.data === YT.PlayerState.PAUSED) {
-        $('mini-play').innerText = "▶";
-        $('fp-play').innerText = "▶";
-        $('player-status').innerText = "Paused";
+        getEl('mini-play').innerText = "▶";
+        getEl('fp-play').innerText = "▶";
+        getEl('player-status').innerText = "Paused";
       } else if (event.data === YT.PlayerState.ENDED) {
         playNext();
       }
@@ -331,135 +459,264 @@
 
     function togglePlay(e) {
       if(e) e.stopPropagation();
-      $('silent-audio').play().catch(()=>{});
+      wakeAudio();
+      
       if (!ytPlayer || typeof ytPlayer.getPlayerState !== 'function') return;
-      if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) ytPlayer.pauseVideo();
-      else ytPlayer.playVideo();
+      
+      if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+         ytPlayer.pauseVideo();
+      } else {
+         ytPlayer.playVideo();
+      }
     }
 
     function loadSong(index) {
       if (!currentPlaylist[index]) return;
+      
       currentSongIndex = index;
       const song = currentPlaylist[index];
       
-      $('mini-player').style.display = 'flex';
-      $('mini-thumb').src = song.thumb;
-      $('mini-title').innerText = song.title;
-      $('mini-artist').innerText = song.author;
-      $('fp-thumb').src = song.thumb;
-      $('fp-title').innerText = song.title;
-      $('fp-artist').innerText = song.author;
+      // Update Mini Player UI
+      getEl('mini-player').style.display = 'flex';
+      getEl('mini-thumb').src = song.thumb;
+      getEl('mini-title').innerText = song.title;
+      getEl('mini-artist').innerText = song.author;
+      
+      // Update Full Player UI
+      getEl('fp-thumb').src = song.thumb;
+      getEl('fp-title').innerText = song.title;
+      getEl('fp-artist').innerText = song.author;
       
       updateFavBtnUI();
-      if(restoreToggle.checked) {
+      setMediaData(song);
+      
+      // Save State
+      if(restoreToggle && restoreToggle.checked) {
         localStorage.setItem("pm_last_state", JSON.stringify({ playlist: currentPlaylist, index: currentSongIndex }));
       }
-      setMediaData(song);
 
+      // Start Playback
       if (ytReady && ytPlayer) {
         ytPlayer.loadVideoById({ videoId: song.videoId });
-        $('mute-btn').innerText = "🔊";
-        isMuted = false;
+        
+        // Handle Mute/Volume Restore
+        if(volumeToggle && volumeToggle.checked && localStorage.getItem("pm_muted") === "1") {
+            ytPlayer.mute();
+            getEl('mute-btn').innerText = "🔇";
+            isMuted = true;
+        } else {
+            ytPlayer.unMute();
+            getEl('mute-btn').innerText = "🔊";
+            isMuted = false;
+        }
       }
     }
 
+    // 9. FAVORITES HANDLING
     function updateFavBtnUI() {
       if(!currentPlaylist[currentSongIndex]) return;
       const isFav = favorites.some(f => f.videoId === currentPlaylist[currentSongIndex].videoId);
-      const btn = $('fp-fav-btn');
-      btn.innerText = isFav ? "❤️" : "🤍";
-      btn.style.color = isFav ? "var(--accent)" : "var(--muted)";
+      const btn = getEl('fp-fav-btn');
+      if(btn) {
+        btn.innerText = isFav ? "❤️" : "🤍";
+        btn.style.color = isFav ? "var(--accent)" : "var(--muted)";
+      }
     }
 
     async function toggleFavorite(song) {
       const idx = favorites.findIndex(f => f.videoId === song.videoId);
-      if (idx > -1) favorites.splice(idx, 1); else favorites.push(song);
+      if (idx > -1) {
+        favorites.splice(idx, 1);
+      } else {
+        favorites.push(song);
+      }
+      
       if (currentUser) {
-        await setDoc(doc(db, "users", currentUser.uid), { favorites }, { merge: true });
+        try {
+          await setDoc(doc(db, "users", currentUser.uid), { favorites }, { merge: true });
+        } catch(e) { console.error(e); }
       } else {
         localStorage.setItem("pm_favs", JSON.stringify(favorites));
-        if ($('tab-fav').classList.contains('active')) renderFavs();
+        if (getEl('tab-fav').classList.contains('active')) renderFavs();
         updateFavBtnUI();
       }
     }
 
+    // 10. MEDIA CONTROLS ATTACHMENTS
     function playNext(e) { if(e) e.stopPropagation(); if(currentPlaylist.length) loadSong((currentSongIndex + 1) % currentPlaylist.length); }
     function playPrev(e) { if(e) e.stopPropagation(); if(currentPlaylist.length) loadSong((currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length); }
 
-    $('mini-play').onclick = togglePlay; $('fp-play').onclick = togglePlay;
-    $('mini-next').onclick = playNext; $('fp-next').onclick = playNext;
-    $('mini-prev').onclick = playPrev; $('fp-prev').onclick = playPrev;
+    addSafeEvent('mini-play', 'click', togglePlay);
+    addSafeEvent('fp-play', 'click', togglePlay);
+    addSafeEvent('mini-next', 'click', playNext);
+    addSafeEvent('fp-next', 'click', playNext);
+    addSafeEvent('mini-prev', 'click', playPrev);
+    addSafeEvent('fp-prev', 'click', playPrev);
 
-    $('mini-open').onclick = () => $('full-player').classList.add('open');
-    $('fp-close').onclick = () => $('full-player').classList.remove('open');
-    $('fp-fav-btn').onclick = () => toggleFavorite(currentPlaylist[currentSongIndex]);
-
-    $('mode-audio').onclick = () => { $('mode-audio').classList.add('active'); $('mode-video').classList.remove('active'); $('media-container').classList.remove('video-active'); };
-    $('mode-video').onclick = () => { $('mode-video').classList.add('active'); $('mode-audio').classList.remove('active'); $('media-container').classList.add('video-active'); };
+    addSafeEvent('mini-open', 'click', () => getEl('full-player').classList.add('open'));
+    addSafeEvent('fp-close', 'click', () => getEl('full-player').classList.remove('open'));
     
-    $('mute-btn').onclick = () => { 
-      if(ytPlayer && typeof ytPlayer.isMuted === 'function') { 
-        if(isMuted) { ytPlayer.unMute(); $('mute-btn').innerText="🔊"; isMuted=false; } 
-        else { ytPlayer.mute(); $('mute-btn').innerText="🔇"; isMuted=true; } 
-      } 
-    };
-    $('fs-btn').onclick = () => { const iframe = ytPlayer.getIframe(); if(iframe && iframe.requestFullscreen) iframe.requestFullscreen(); };
+    addSafeEvent('fp-fav-btn', 'click', () => toggleFavorite(currentPlaylist[currentSongIndex]));
 
-    // SEARCH LOGIC
-    $('search-btn').onclick = () => performSearch($('search-input').value);
-    $('search-input').onkeydown = e => { if(e.key === "Enter") performSearch($('search-input').value); };
-    document.querySelectorAll('.tag').forEach(tag => { tag.onclick = () => { $('search-input').value = tag.innerText; $('tab-search').click(); performSearch(tag.innerText); }; });
+    // Mode Audio/Video toggles
+    addSafeEvent('mode-audio', 'click', () => { 
+        getEl('mode-audio').classList.add('active'); 
+        getEl('mode-video').classList.remove('active'); 
+        getEl('media-container').classList.remove('video-active'); 
+    });
+    
+    addSafeEvent('mode-video', 'click', () => { 
+        getEl('mode-video').classList.add('active'); 
+        getEl('mode-audio').classList.remove('active'); 
+        getEl('media-container').classList.add('video-active'); 
+    });
+    
+    // Mute and Fullscreen Logic
+    addSafeEvent('mute-btn', 'click', () => { 
+      if(ytPlayer && typeof ytPlayer.isMuted === 'function') { 
+        if(isMuted) { 
+            ytPlayer.unMute(); 
+            getEl('mute-btn').innerText="🔊"; 
+            isMuted=false; 
+            if(volumeToggle && volumeToggle.checked) localStorage.setItem("pm_muted", "0");
+        } else { 
+            ytPlayer.mute(); 
+            getEl('mute-btn').innerText="🔇"; 
+            isMuted=true; 
+            if(volumeToggle && volumeToggle.checked) localStorage.setItem("pm_muted", "1");
+        } 
+      } 
+    });
+    
+    addSafeEvent('fs-btn', 'click', () => { 
+        const iframe = ytPlayer.getIframe(); 
+        if(iframe && iframe.requestFullscreen) iframe.requestFullscreen(); 
+    });
+
+    // 11. SEARCH YOUTUBE API LOGIC
+    addSafeEvent('search-btn', 'click', () => performSearch(getEl('search-input').value));
+    addSafeEvent('search-input', 'keydown', e => { 
+        if(e.key === "Enter") performSearch(getEl('search-input').value); 
+    });
+    
+    document.querySelectorAll('.tag').forEach(tag => { 
+        tag.onclick = () => { 
+            getEl('search-input').value = tag.innerText; 
+            getEl('tab-search').click(); 
+            performSearch(tag.innerText); 
+        }; 
+    });
 
     async function performSearch(query) {
       if (!query.trim()) return;
-      $('results-list').innerHTML = '<p style="text-align:center;color:var(--muted)">Searching...</p>';
+      getEl('results-list').innerHTML = '<p style="text-align:center;color:var(--muted)">Searching YouTube...</p>';
+      
       try {
         const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&maxResults=20&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`);
         const data = await res.json();
+        
         if (data.items) {
           currentPlaylist = data.items.map(i => ({
-            videoId: i.id.videoId, title: decodeHtml(i.snippet.title), author: i.snippet.channelTitle,
+            videoId: i.id.videoId, 
+            title: decodeHtml(i.snippet.title), 
+            author: i.snippet.channelTitle,
             thumb: i.snippet.thumbnails?.high?.url || i.snippet.thumbnails?.default?.url
           }));
           renderList(currentPlaylist);
+        } else {
+            getEl('results-list').innerHTML = '<p style="text-align:center;color:#ff5555">Daily Search Limit Reached.</p>'; 
         }
-      } catch (err) { $('results-list').innerHTML = '<p style="text-align:center;color:#ff5555">Error searching.</p>'; }
+      } catch (err) { 
+          getEl('results-list').innerHTML = '<p style="text-align:center;color:#ff5555">Network Error.</p>'; 
+      }
     }
 
+    // 12. RENDER LISTS
     function renderList(items) {
-      const list = $('results-list'); list.innerHTML = "";
-      if(!items.length) { list.innerHTML = '<p style="text-align:center;color:var(--muted)">No results.</p>'; return; }
+      const list = getEl('results-list'); 
+      list.innerHTML = "";
+      
+      if(!items.length) { 
+          list.innerHTML = '<p style="text-align:center;color:var(--muted)">No results.</p>'; 
+          return; 
+      }
+      
       items.forEach((song, idx) => {
         const isFav = favorites.some(f => f.videoId === song.videoId);
-        const card = document.createElement('div'); card.className = 'song-card';
-        card.innerHTML = `<img src="${song.thumb}" alt="Cover"><div class="song-info"><h4>${song.title}</h4><p>${song.author}</p></div><button class="fav-btn ${isFav ? 'active' : ''}">${isFav ? '❤️' : '🤍'}</button>`;
-        card.querySelector('.song-info').onclick = () => { currentPlaylist = items; loadSong(idx); $('full-player').classList.add('open'); };
+        const card = document.createElement('div'); 
+        card.className = 'song-card';
+        card.innerHTML = `
+            <img src="${song.thumb}" alt="Cover">
+            <div class="song-info">
+                <h4>${song.title}</h4>
+                <p>${song.author}</p>
+            </div>
+            <button class="fav-btn ${isFav ? 'active' : ''}">${isFav ? '❤️' : '🤍'}</button>
+        `;
+        
+        // Clicks
+        card.querySelector('.song-info').onclick = () => { 
+            currentPlaylist = items; 
+            loadSong(idx); 
+            getEl('full-player').classList.add('open'); 
+        };
         card.querySelector('img').onclick = card.querySelector('.song-info').onclick;
+        
+        // Favorite
         const btn = card.querySelector('.fav-btn');
-        btn.onclick = (e) => { e.stopPropagation(); toggleFavorite(song); btn.innerText = favorites.some(f => f.videoId === song.videoId) ? '❤️' : '🤍'; btn.classList.toggle('active'); };
+        btn.onclick = (e) => { 
+            e.stopPropagation(); 
+            toggleFavorite(song); 
+            btn.innerText = favorites.some(f => f.videoId === song.videoId) ? '❤️' : '🤍'; 
+            btn.classList.toggle('active'); 
+        };
+        
         list.appendChild(card);
       });
     }
 
-    $('tab-search').onclick = () => { $('tab-search').classList.add('active'); $('tab-fav').classList.remove('active'); renderList(currentPlaylist); };
-    $('tab-fav').onclick = renderFavs;
-    function renderFavs() { $('tab-fav').classList.add('active'); $('tab-search').classList.remove('active'); renderList(favorites); }
-
-    function decodeHtml(html) { const txt = document.createElement("textarea"); txt.innerHTML = html; return txt.value; }
+    // Tabs toggle
+    addSafeEvent('tab-search', 'click', () => { 
+        getEl('tab-search').classList.add('active'); 
+        getEl('tab-fav').classList.remove('active'); 
+        renderList(currentPlaylist); 
+    });
     
+    addSafeEvent('tab-fav', 'click', renderFavs);
+    
+    function renderFavs() { 
+        getEl('tab-fav').classList.add('active'); 
+        getEl('tab-search').classList.remove('active'); 
+        renderList(favorites); 
+    }
+
+    function decodeHtml(html) { 
+        const txt = document.createElement("textarea"); 
+        txt.innerHTML = html; 
+        return txt.value; 
+    }
+    
+    // 13. RESTORE SESSION STATE
     function restoreState() {
-      if(!restoreToggle.checked) return;
+      if(restoreToggle && !restoreToggle.checked) return;
       try { 
         const s = JSON.parse(localStorage.getItem("pm_last_state")); 
         if(s && s.playlist && s.playlist.length > 0) { 
-          currentPlaylist = s.playlist; currentSongIndex = s.index; renderList(currentPlaylist); updateFavBtnUI(); 
+          currentPlaylist = s.playlist; 
+          currentSongIndex = s.index; 
+          renderList(currentPlaylist); 
+          updateFavBtnUI(); 
+          
           const activeSong = currentPlaylist[currentSongIndex];
-          $('mini-player').style.display = 'flex'; $('mini-thumb').src = $('fp-thumb').src = activeSong.thumb; $('mini-title').innerText = $('fp-title').innerText = activeSong.title; $('mini-artist').innerText = $('fp-artist').innerText = activeSong.author; 
+          getEl('mini-player').style.display = 'flex'; 
+          getEl('mini-thumb').src = getEl('fp-thumb').src = activeSong.thumb; 
+          getEl('mini-title').innerText = getEl('fp-title').innerText = activeSong.title; 
+          getEl('mini-artist').innerText = getEl('fp-artist').innerText = activeSong.author; 
         } 
-      } catch(e) {}
+      } catch(e) { console.error("Restore failed", e); }
     }
 
-    // Media Session for Lock Screen
+    // 14. LOCK SCREEN MEDIA CONTROLS
     function setupMediaSession() {
       if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('play', togglePlay);
@@ -478,6 +735,40 @@
           artwork: [{ src: song.thumb, sizes: '512x512', type: 'image/jpeg' }]
         });
       }
+    }
+
+    // 15. PWA INSTALLATION LOGIC
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = getEl('install-now');
+      const bannerBtn = getEl('pwa-install-btn');
+      
+      if(installBtn) installBtn.style.display = 'block';
+      if(bannerBtn) bannerBtn.style.display = 'block';
+    });
+    
+    const handleInstallClick = async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          if(getEl('install-now')) getEl('install-now').style.display = 'none';
+          if(getEl('pwa-install-btn')) getEl('pwa-install-btn').style.display = 'none';
+        }
+        deferredPrompt = null;
+      }
+    };
+    
+    addSafeEvent('install-now', 'click', handleInstallClick);
+    addSafeEvent('pwa-install-btn', 'click', handleInstallClick);
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-worker.js').catch((e)=>{ console.warn('SW failed', e); });
+      });
     }
   </script>
 </body>
