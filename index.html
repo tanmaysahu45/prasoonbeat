@@ -14,44 +14,36 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     :root{--pink:#ff0055;--bg:#0b0b10;--panel:#15151d;--panel2:#1d1d27;--line:#2b2b38;--muted:#8d8d9d}
-    body{background:radial-gradient(circle at top,#19111a 0,#0b0b10 42%);color:#fff;min-height:100vh;padding-bottom:110px}
+    body{background:radial-gradient(circle at top,#19111a 0,#0b0b10 42%);color:#fff;min-height:100vh;padding-bottom:120px;overflow-x:hidden}
     button,input{font:inherit}
     button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+    
+    /* Header */
     header{position:sticky;top:0;z-index:100;background:rgba(15,15,20,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:14px 5%;display:flex;align-items:center;justify-content:space-between}
     .logo{font-weight:900;font-size:20px;color:var(--pink);letter-spacing:-.4px}
     .auth-btn,.search-section button{border:1px solid var(--pink);background:transparent;color:#fff;border-radius:999px;padding:9px 15px;font-weight:700;transition:.18s}
-    .auth-btn:active,.search-section button:active,.mode-btn:active,.tab-btn:active,.bp-btn:active,.bp-play-btn:active,.screen-action:active{transform:scale(.92)}
+    .auth-btn:active,.search-section button:active,.mode-btn:active,.tab-btn:active,.bp-btn:active,.bp-play-btn:active{transform:scale(.92)}
     .user-profile{display:none;align-items:center;gap:8px}
     .user-profile img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+
+    /* Search Section */
     .search-section{width:90%;max-width:680px;margin:18px auto 10px;display:flex;gap:9px}
     .search-section input{min-width:0;flex:1;padding:13px 17px;border:1px solid var(--line);background:var(--panel);color:#fff;border-radius:999px;outline:none}
     .search-section input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,0,85,.12)}
     .search-section button{padding:12px 20px}
+
+    /* Quick Singers */
     .fav-singers{width:90%;max-width:680px;margin:auto;display:flex;gap:8px;overflow:auto;padding:2px 0 13px;scrollbar-width:none}
     .fav-singers::-webkit-scrollbar{display:none}
     .singer-tag{white-space:nowrap;padding:8px 13px;background:var(--panel);border:1px solid var(--line);border-radius:999px;font-size:13px;color:#ddd;transition:.18s}
     .singer-tag:hover{border-color:var(--pink);color:#fff}
-    .player-container{width:92%;max-width:720px;margin:8px auto 20px;background:linear-gradient(145deg,#191923,#111118);border:1px solid var(--line);border-radius:24px;padding:14px;box-shadow:0 18px 55px rgba(0,0,0,.42)}
-    .mode-toggle{display:flex;gap:6px;background:#0c0c11;border:1px solid var(--line);padding:5px;border-radius:999px;margin-bottom:12px}
-    .mode-btn{flex:1;border:1px solid transparent;background:transparent;color:var(--muted);padding:10px;border-radius:999px;font-weight:800;transition:.18s}
-    .mode-btn.active{background:var(--pink);border-color:var(--pink);color:#fff;box-shadow:0 5px 20px rgba(255,0,85,.22)}
-    .screen-box{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:16px;background:#000;border:1px solid #30303b}
-    .audio-display{position:absolute;inset:0;z-index:2;background:radial-gradient(circle,#21151e,#050507 65%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:.25s}
-    .rotating-disc{width:min(38vw,190px);height:min(38vw,190px);border-radius:50%;object-fit:cover;box-shadow:0 0 40px rgba(255,0,85,.23);border:5px solid #262630}
-    .rotating-disc.spin{animation:spin 8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .now-playing-small{max-width:80%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#ddd;font-size:13px}
-    #video-wrapper{position:absolute;inset:0;z-index:4;background:#000;opacity:0;pointer-events:none;transition:opacity .22s}
-    #yt-player,#yt-player iframe{width:100%!important;height:100%!important}
-    .video-mode #video-wrapper{opacity:1;pointer-events:auto}
-    .video-mode .audio-display{opacity:0;pointer-events:none}
-    .screen-actions{position:absolute;right:10px;top:10px;z-index:7;display:flex;gap:7px}
-    .screen-action{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.58);color:#fff;backdrop-filter:blur(8px);transition:.18s}
-    .screen-message{position:absolute;z-index:8;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;color:#aaa;background:rgba(0,0,0,.35);pointer-events:none}
-    .screen-message.hidden{display:none}
-    .tab-section{width:92%;max-width:680px;margin:22px auto 13px;display:flex;gap:22px;border-bottom:1px solid var(--line)}
+
+    /* Tabs */
+    .tab-section{width:92%;max-width:680px;margin:15px auto 13px;display:flex;gap:22px;border-bottom:1px solid var(--line)}
     .tab-btn{border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);padding:10px 3px;font-weight:800;transition:.18s}
     .tab-btn.active{color:#fff;border-bottom-color:var(--pink)}
+
+    /* Song List */
     .results-section{width:92%;max-width:680px;margin:auto}
     .song-list{display:flex;flex-direction:column;gap:10px}
     .song-card{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid transparent;padding:10px;border-radius:15px;transition:.18s}
@@ -63,7 +55,9 @@
     .song-meta p{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .fav-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:transparent;color:#777;font-size:19px;transition:.18s;flex:none}
     .fav-btn.loved{color:var(--pink);border-color:var(--pink)}
-    .bottom-player{position:fixed;z-index:1000;left:0;right:0;bottom:0;background:rgba(20,20,27,.94);backdrop-filter:blur(20px);border-top:1px solid var(--line);padding:10px 4%;display:flex;align-items:center;gap:12px;box-shadow:0 -12px 35px rgba(0,0,0,.35)}
+
+    /* Spotify Style Bottom Mini Player */
+    .bottom-player{position:fixed;z-index:900;left:0;right:0;bottom:0;background:rgba(20,20,27,.96);backdrop-filter:blur(20px);border-top:1px solid var(--line);padding:10px 4%;display:flex;align-items:center;gap:12px;box-shadow:0 -12px 35px rgba(0,0,0,.45);cursor:pointer}
     .bp-info{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
     .bp-info img{width:48px;height:48px;border-radius:9px;object-fit:cover;flex:none}
     .bp-text{min-width:0}
@@ -74,36 +68,61 @@
     .bp-btn,.bp-play-btn{border:1px solid transparent;background:transparent;color:#fff;width:39px;height:39px;border-radius:50%;transition:.18s}
     .bp-btn{font-size:18px}
     .bp-play-btn{background:var(--pink);border-color:var(--pink);font-size:17px;box-shadow:0 5px 20px rgba(255,0,85,.25)}
-    .status{font-size:11px;color:var(--muted);text-align:center;margin:9px auto 0}
-    .options-fab{position:fixed;right:18px;bottom:78px;z-index:1050;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(25,25,32,.94);color:#fff;box-shadow:0 8px 25px rgba(0,0,0,.35);transition:.18s}
-    .options-fab:active,.close-options:active,.install-now:active{transform:scale(.9)}
-    .options-sheet{position:fixed;left:50%;bottom:0;z-index:1200;width:min(94%,520px);transform:translate(-50%,110%);opacity:0;pointer-events:none;background:#181820;border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;padding:18px;box-shadow:0 -20px 50px rgba(0,0,0,.55);transition:.25s}
+
+    /* Spotify Full Screen Expanded Modal Player */
+    .full-player-overlay{position:fixed;inset:0;background:linear-gradient(180deg,#1e121b 0%,#0c0b11 75%);z-index:1500;display:flex;flex-direction:column;padding:20px;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,1,0.23,1);overflow-y:auto}
+    .full-player-overlay.open{transform:translateY(0)}
+    .fp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+    .fp-down-btn{background:transparent;border:0;color:#fff;font-size:28px;padding:5px 12px;line-height:1}
+    .fp-header-title{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+    /* Screen box in Full Player */
+    .screen-box{position:relative;width:100%;max-width:480px;margin:0 auto;aspect-ratio:1/1;max-height:48vh;border-radius:20px;background:#000;border:1px solid #30303b;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.6)}
+    .audio-display{position:absolute;inset:0;z-index:2;background:radial-gradient(circle,#21151e,#050507 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:.25s}
+    .rotating-disc{width:min(55vw,220px);height:min(55vw,220px);border-radius:50%;object-fit:cover;box-shadow:0 0 45px rgba(255,0,85,.25);border:6px solid #262630}
+    .rotating-disc.spin{animation:spin 9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    
+    #video-wrapper{position:absolute;inset:0;z-index:4;background:#000;opacity:0;pointer-events:none;transition:opacity .22s}
+    #yt-player,#yt-player iframe{width:100%!important;height:100%!important}
+    .video-mode #video-wrapper{opacity:1;pointer-events:auto}
+    .video-mode .audio-display{opacity:0;pointer-events:none}
+
+    .mode-toggle{display:flex;gap:6px;background:#14141d;border:1px solid var(--line);padding:5px;border-radius:999px;width:100%;max-width:320px;margin:15px auto}
+    .mode-btn{flex:1;border:1px solid transparent;background:transparent;color:var(--muted);padding:8px;border-radius:999px;font-weight:800;font-size:13px;transition:.18s}
+    .mode-btn.active{background:var(--pink);border-color:var(--pink);color:#fff;box-shadow:0 5px 20px rgba(255,0,85,.22)}
+
+    .fp-details{width:100%;max-width:480px;margin:15px auto 10px;text-align:left}
+    .fp-details h2{font-size:19px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .fp-details p{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .fp-controls{display:flex;align-items:center;justify-content:center;gap:25px;margin-top:15px}
+    .fp-ctrl-btn{background:transparent;border:0;color:#fff;font-size:28px}
+    .fp-play-btn{width:64px;height:64px;border-radius:50%;background:var(--pink);border:0;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 25px rgba(255,0,85,.35)}
+
+    .screen-actions{position:absolute;right:10px;top:10px;z-index:7;display:flex;gap:7px}
+    .screen-action{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.6);color:#fff;backdrop-filter:blur(8px)}
+
+    /* Options Sheet & Install Button */
+    .options-fab{position:fixed;right:18px;bottom:78px;z-index:950;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(25,25,32,.94);color:#fff;box-shadow:0 8px 25px rgba(0,0,0,.35)}
+    .options-sheet{position:fixed;left:50%;bottom:0;z-index:1600;width:min(94%,520px);transform:translate(-50%,110%);opacity:0;pointer-events:none;background:#181820;border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;padding:18px;box-shadow:0 -20px 50px rgba(0,0,0,.55);transition:.25s}
     .options-sheet.open{transform:translate(-50%,0);opacity:1;pointer-events:auto}
     .options-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .close-options{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;color:#fff;transition:.18s}
-    .option-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px 2px;border-top:1px solid var(--line)}
-    .option-row span{display:flex;flex-direction:column;gap:3px}
-    .option-row small{color:var(--muted);font-size:11px}
-    .option-row input{appearance:none;width:48px;height:27px;border-radius:30px;background:#33333d;border:1px solid #444;position:relative;transition:.2s;flex:none}
-    .option-row input:before{content:"";position:absolute;width:21px;height:21px;left:2px;top:2px;border-radius:50%;background:#fff;transition:.2s}
-    .option-row input:checked{background:var(--pink);border-color:var(--pink)}
-    .option-row input:checked:before{transform:translateX(21px)}
-    .install-now{width:100%;margin-top:14px;padding:12px;border-radius:999px;border:1px solid var(--pink);background:var(--pink);color:#fff;font-weight:800;transition:.18s}
-    .install-note{font-size:11px;color:var(--muted);text-align:center;margin-top:9px;line-height:1.4}
-    
-    .install-banner{display:none;position:fixed;z-index:1100;bottom:85px;left:50%;transform:translateX(-50%);border:1px solid var(--pink);background:var(--pink);color:#fff;padding:12px 30px;border-radius:999px;font-weight:800;box-shadow:0 5px 20px rgba(255,0,85,0.4);cursor:pointer;}
-    .install-banner:active{transform:translateX(-50%) scale(0.95);}
+    .close-options{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;color:#fff}
+    .install-banner{display:none;position:fixed;z-index:950;bottom:78px;left:50%;transform:translateX(-50%);border:1px solid var(--pink);background:var(--pink);color:#fff;padding:10px 24px;border-radius:999px;font-weight:800;box-shadow:0 5px 20px rgba(255,0,85,0.4);font-size:13px}
     
     @media(max-width:600px){
-      header{padding:12px 4%}.logo{font-size:17px}.auth-btn{padding:8px 11px;font-size:12px}
-      .search-section button{padding:11px 15px}
-      .bottom-player{padding:9px 3%;gap:5px}.bp-info img{width:43px;height:43px}.bp-controls{gap:0}.bp-btn,.bp-play-btn{width:36px;height:36px}
-      .bp-btn:first-child,.bp-btn:last-child{font-size:16px}
+      .screen-box{aspect-ratio:16/10}
+      .bottom-player{padding:9px 3%;gap:6px}
+      .bp-info img{width:42px;height:42px}
     }
   </style>
 </head>
 
 <body>
+  <!-- Hidden Background Silent Audio loop to keep web app audio thread alive when screen locks -->
+  <audio id="bg-audio-keeper" loop playsinline preload="auto" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"></audio>
+
   <header>
     <div class="logo">⚡ Prasoon Music</div>
     <div>
@@ -129,33 +148,6 @@
     <button class="singer-tag" data-singer="Badshah">Badshah</button>
   </div>
 
-  <main class="player-container">
-    <div class="mode-toggle">
-      <button class="mode-btn active" id="audio-mode-btn">🎵 Audio Mode</button>
-      <button class="mode-btn" id="video-mode-btn">🎬 Video Mode</button>
-    </div>
-
-    <div class="screen-box" id="screen-box">
-      <div class="audio-display">
-        <img id="poster-art" class="rotating-disc" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500" alt="Album Art">
-        <div class="now-playing-small" id="now-playing-small">Select a song to start</div>
-      </div>
-
-      <div id="video-wrapper">
-        <div id="yt-player"></div>
-      </div>
-
-      <div class="screen-actions">
-        <button class="screen-action" id="mute-btn" title="Mute / Unmute">🔊</button>
-        <button class="screen-action" id="fullscreen-btn" title="Fullscreen">⛶</button>
-      </div>
-
-      <div class="screen-message" id="screen-message">Search a song, then tap a result to play it.</div>
-    </div>
-
-    <div class="status" id="player-status">Player is ready when YouTube finishes loading.</div>
-  </main>
-
   <div class="tab-section">
     <button class="tab-btn active" id="tab-search">Search Results</button>
     <button class="tab-btn" id="tab-fav">Favorites ❤️</button>
@@ -167,12 +159,13 @@
     </div>
   </section>
 
-  <div class="bottom-player">
-    <div class="bp-info">
+  <!-- Spotify Style Mini Bar Player -->
+  <div class="bottom-player" id="bottom-bar">
+    <div class="bp-info" id="bp-open-trigger">
       <img id="bp-thumb" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120" alt="thumb">
       <div class="bp-text">
         <h4 id="bp-title">Select a Song</h4>
-        <p id="bp-artist">Prasoon Music</p>
+        <p id="bp-artist">Tap here to open player</p>
       </div>
     </div>
     <div class="bp-controls">
@@ -182,26 +175,60 @@
     </div>
   </div>
 
-  <div class="install-banner" id="pwa-install-btn">📲 Install App</div>
-
-  <div class="options-sheet" id="options-sheet" aria-hidden="true">
-    <div class="options-head">
-      <strong>Player Options</strong>
-      <button id="close-options" class="close-options">✕</button>
+  <!-- Fullscreen Expanded Player (Spotify Style) -->
+  <div class="full-player-overlay" id="full-player">
+    <div class="fp-header">
+      <button class="fp-down-btn" id="fp-close" title="Minimize">⌄</button>
+      <div class="fp-header-title">Now Playing</div>
+      <button class="screen-action" id="fp-fav-btn" style="background:transparent;border:0;font-size:22px">🤍</button>
     </div>
-    <label class="option-row">
-      <span><b>🔄 Restore after refresh</b><small>Song, mode and player state याद रखें</small></span>
-      <input id="restore-toggle" type="checkbox" checked>
-    </label>
-    <label class="option-row">
-      <span><b>🔊 Remember volume</b><small>Mute/unmute preference याद रखें</small></span>
-      <input id="volume-toggle" type="checkbox" checked>
-    </label>
-    <button id="install-now" class="install-now">📲 Install App</button>
-    <p class="install-note" id="install-note">Install तभी उपलब्ध होगा जब browser PWA install को अनुमति दे।</p>
+
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="audio-mode-btn">🎵 Audio Only</button>
+      <button class="mode-btn" id="video-mode-btn">🎬 Watch Video</button>
+    </div>
+
+    <div class="screen-box" id="screen-box">
+      <div class="audio-display">
+        <img id="poster-art" class="rotating-disc" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500" alt="Album Art">
+      </div>
+
+      <div id="video-wrapper">
+        <div id="yt-player"></div>
+      </div>
+
+      <div class="screen-actions">
+        <button class="screen-action" id="mute-btn" title="Mute/Unmute">🔊</button>
+        <button class="screen-action" id="fullscreen-btn" title="Fullscreen">⛶</button>
+      </div>
+    </div>
+
+    <div class="fp-details">
+      <h2 id="fp-song-title">Song Title</h2>
+      <p id="fp-song-artist">Artist Name</p>
+    </div>
+
+    <div class="fp-controls">
+      <button class="fp-ctrl-btn" id="fp-btn-prev">⏮</button>
+      <button class="fp-play-btn" id="fp-btn-play">▶</button>
+      <button class="fp-ctrl-btn" id="fp-btn-next">⏭</button>
+    </div>
   </div>
 
-  <button class="options-fab" id="options-fab" title="Options">⚙️</button>
+  <div class="install-banner" id="pwa-install-btn">📲 Install App</div>
+
+  <div class="options-sheet" id="options-sheet">
+    <div class="options-head">
+      <strong>Player Settings</strong>
+      <button id="close-options" class="close-options">✕</button>
+    </div>
+    <p style="color:#aaa;font-size:13px;line-height:1.5;margin-bottom:12px">
+      Screen lock hone par bhi gaane sunne ke liye Audio Mode chalu rakhein.
+    </p>
+    <button id="install-now" class="auth-btn" style="width:100%;border-color:var(--pink);background:var(--pink)">📲 Install App</button>
+  </div>
+
+  <button class="options-fab" id="options-fab" title="Settings">⚙️</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
@@ -242,18 +269,29 @@
     const videoModeBtn = $("video-mode-btn");
     const screenBox = $("screen-box");
     const posterArt = $("poster-art");
-    const nowPlayingSmall = $("now-playing-small");
-    const screenMessage = $("screen-message");
-    const playerStatus = $("player-status");
+
+    const bottomBar = $("bottom-bar");
+    const bpOpenTrigger = $("bp-open-trigger");
+    const fullPlayer = $("full-player");
+    const fpClose = $("fp-close");
 
     const bpTitle = $("bp-title");
     const bpArtist = $("bp-artist");
     const bpThumb = $("bp-thumb");
+    const fpSongTitle = $("fp-song-title");
+    const fpSongArtist = $("fp-song-artist");
+    const fpFavBtn = $("fp-fav-btn");
+
     const btnPlay = $("btn-play");
     const btnNext = $("btn-next");
     const btnPrev = $("btn-prev");
+    const fpBtnPlay = $("fp-btn-play");
+    const fpBtnNext = $("fp-btn-next");
+    const fpBtnPrev = $("fp-btn-prev");
+
     const muteBtn = $("mute-btn");
     const fullscreenBtn = $("fullscreen-btn");
+    const bgAudio = $("bg-audio-keeper");
 
     const tabSearch = $("tab-search");
     const tabFav = $("tab-fav");
@@ -262,106 +300,26 @@
     let ytReady = false;
     let isPlaying = false;
     let isMuted = false;
-    let pendingVideoId = null;
     let currentPlaylist = [];
     let currentSongIndex = 0;
     let favorites = JSON.parse(localStorage.getItem("myFavorites") || "[]");
 
-    const optionsFab = $("options-fab");
-    const optionsSheet = $("options-sheet");
-    const closeOptions = $("close-options");
-    const installNowBtn = $("install-now");
-    const restoreToggle = $("restore-toggle");
-    const volumeToggle = $("volume-toggle");
-    const installBtn = $("pwa-install-btn");
-
-    const savedRestore = localStorage.getItem("pm_restore");
-    const savedVolume = localStorage.getItem("pm_volume");
-    if (savedRestore !== null) restoreToggle.checked = savedRestore === "1";
-    if (savedVolume !== null) volumeToggle.checked = savedVolume === "1";
-
-    restoreToggle.addEventListener("change", () => {
-      localStorage.setItem("pm_restore", restoreToggle.checked ? "1" : "0");
-      if (!restoreToggle.checked) localStorage.removeItem("pm_state");
+    // Full player toggle
+    bpOpenTrigger.addEventListener("click", () => {
+      fullPlayer.classList.add("open");
+    });
+    fpClose.addEventListener("click", () => {
+      fullPlayer.classList.remove("open");
     });
 
-    volumeToggle.addEventListener("change", () => {
-      localStorage.setItem("pm_volume", volumeToggle.checked ? "1" : "0");
-    });
-
-    optionsFab.addEventListener("click", () => {
-      optionsSheet.classList.add("open");
-      optionsSheet.setAttribute("aria-hidden", "false");
-    });
-    closeOptions.addEventListener("click", () => {
-      optionsSheet.classList.remove("open");
-      optionsSheet.setAttribute("aria-hidden", "true");
-    });
-
-    function savePlayerState() {
-      if (!restoreToggle.checked || !currentPlaylist.length) return;
-
-      const state = {
-        videoId: currentPlaylist[currentSongIndex]?.videoId || "",
-        title: currentPlaylist[currentSongIndex]?.title || "",
-        author: currentPlaylist[currentSongIndex]?.author || "",
-        thumb: currentPlaylist[currentSongIndex]?.thumb || "",
-        mode: screenBox.classList.contains("video-mode") ? "video" : "audio",
-        muted: isMuted,
-        playing: isPlaying
-      };
-      localStorage.setItem("pm_state", JSON.stringify(state));
-    }
-
-    function restorePlayerState() {
-      if (!restoreToggle.checked) return;
-      const raw = localStorage.getItem("pm_state");
-      if (!raw) return;
-
-      try {
-        const state = JSON.parse(raw);
-        if (!state.videoId) return;
-
-        const restoredSong = {
-          videoId: state.videoId,
-          title: state.title || "Restored Song",
-          author: state.author || "YouTube",
-          thumb: state.thumb || "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500"
-        };
-
-        currentPlaylist = [restoredSong];
-        currentSongIndex = 0;
-        bpTitle.textContent = restoredSong.title;
-        bpArtist.textContent = restoredSong.author;
-        bpThumb.src = restoredSong.thumb;
-        posterArt.src = restoredSong.thumb;
-        nowPlayingSmall.textContent = restoredSong.title;
-
-        if (state.mode === "video") {
-          videoModeBtn.click();
-        } else {
-          audioModeBtn.click();
-        }
-
-        pendingVideoId = restoredSong.videoId;
-        playerStatus.textContent = "Restored. Press Play to continue.";
-      } catch (e) {
-        console.warn("Could not restore player state", e);
-      }
-    }
-
-    window.addEventListener("beforeunload", savePlayerState);
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") savePlayerState();
-    });
-
+    // YouTube API Setup
     window.onYouTubeIframeAPIReady = () => {
       ytPlayer = new YT.Player("yt-player", {
         width: "100%",
         height: "100%",
         videoId: "",
         playerVars: {
-          autoplay: 0,
+          autoplay: 1,
           controls: 1,
           fs: 1,
           playsinline: 1,
@@ -370,9 +328,11 @@
           enablejsapi: 1
         },
         events: {
-          onReady: onYouTubeReady,
-          onStateChange: onPlayerStateChange,
-          onError: onPlayerError
+          onReady: () => {
+            ytReady = true;
+            setupMediaSession();
+          },
+          onStateChange: onPlayerStateChange
         }
       });
     };
@@ -382,109 +342,159 @@
     ytScript.async = true;
     document.head.appendChild(ytScript);
 
-    function onYouTubeReady() {
-      ytReady = true;
-      playerStatus.textContent = "YouTube player ready.";
-      
-      // 🔴 Media Session Event Listeners 🔴
+    // Background Audio Handler for Mobile Screen Lock
+    function keepAudioAlive(play) {
+      if (!bgAudio) return;
+      if (play) {
+        bgAudio.play().catch(() => {});
+      } else {
+        bgAudio.pause();
+      }
+    }
+
+    function setupMediaSession() {
       if ('mediaSession' in navigator) {
-        navigator.mediaSession.setActionHandler('play', () => {
-          if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo();
-        });
-        navigator.mediaSession.setActionHandler('pause', () => {
-          if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
-        });
+        navigator.mediaSession.setActionHandler('play', togglePlayPause);
+        navigator.mediaSession.setActionHandler('pause', togglePlayPause);
         navigator.mediaSession.setActionHandler('previoustrack', playPrev);
         navigator.mediaSession.setActionHandler('nexttrack', playNext);
       }
+    }
 
-      if (pendingVideoId) {
-        const id = pendingVideoId;
-        pendingVideoId = null;
-        try {
-          ytPlayer.cueVideoById(id);
-          playerStatus.textContent = "Restored. Press Play to continue.";
-        } catch (e) {}
-      } else {
-        restorePlayerState();
-        if (pendingVideoId) {
-          const id = pendingVideoId;
-          pendingVideoId = null;
-          try { ytPlayer.cueVideoById(id); } catch(e) {}
-        }
+    function updateMediaSession(song) {
+      if ('mediaSession' in navigator && song) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: song.title,
+          artist: song.author,
+          album: 'Prasoon Music',
+          artwork: [
+            { src: song.thumb, sizes: '512x512', type: 'image/jpeg' }
+          ]
+        });
       }
     }
 
     function onPlayerStateChange(event) {
       if (!window.YT) return;
-
-      switch (event.data) {
-        case YT.PlayerState.PLAYING:
-          isPlaying = true;
-          btnPlay.textContent = "⏸";
-          posterArt.classList.add("spin");
-          screenMessage.classList.add("hidden");
-          playerStatus.textContent = "Playing";
-          savePlayerState();
-          break;
-        case YT.PlayerState.PAUSED:
-          isPlaying = false;
-          btnPlay.textContent = "▶";
-          posterArt.classList.remove("spin");
-          playerStatus.textContent = "Paused";
-          savePlayerState();
-          break;
-        case YT.PlayerState.BUFFERING:
-          playerStatus.textContent = "Buffering…";
-          break;
-        case YT.PlayerState.ENDED:
-          isPlaying = false;
-          btnPlay.textContent = "▶";
-          posterArt.classList.remove("spin");
-          playNext();
-          break;
-        case YT.PlayerState.CUED:
-          playerStatus.textContent = "Ready to play";
-          break;
+      if (event.data === YT.PlayerState.PLAYING) {
+        isPlaying = true;
+        btnPlay.textContent = "⏸";
+        fpBtnPlay.textContent = "⏸";
+        posterArt.classList.add("spin");
+        keepAudioAlive(true);
+      } else if (event.data === YT.PlayerState.PAUSED) {
+        isPlaying = false;
+        btnPlay.textContent = "▶";
+        fpBtnPlay.textContent = "▶";
+        posterArt.classList.remove("spin");
+        keepAudioAlive(false);
+      } else if (event.data === YT.PlayerState.ENDED) {
+        isPlaying = false;
+        btnPlay.textContent = "▶";
+        fpBtnPlay.textContent = "▶";
+        posterArt.classList.remove("spin");
+        keepAudioAlive(false);
+        playNext();
       }
     }
 
-    function onPlayerError(event) {
-      isPlaying = false;
-      btnPlay.textContent = "▶";
-      const messages = {
-        2: "Invalid YouTube video ID.",
-        5: "This video cannot be played in this HTML5 player.",
-        100: "Video not found or private.",
-        101: "This video does not allow embedded playback.",
-        150: "This video does not allow embedded playback."
-      };
-      playerStatus.textContent = messages[event.data] || "YouTube playback error.";
-      screenMessage.textContent = messages[event.data] || "This video cannot be played here.";
-      screenMessage.classList.remove("hidden");
-    }
-
-    loginBtn.addEventListener("click", async () => {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        alert("Google Login failed.");
-      }
-    });
-
-    logoutBtn.addEventListener("click", () => signOut(auth));
-
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        loginBtn.style.display = "none";
-        userInfo.style.display = "flex";
-        userImg.src = user.photoURL || "https://via.placeholder.com/40";
+    // Toggle Play/Pause
+    function togglePlayPause(e) {
+      if (e) e.stopPropagation();
+      if (!ytPlayer || !currentPlaylist.length) return;
+      if (isPlaying) {
+        ytPlayer.pauseVideo();
       } else {
-        loginBtn.style.display = "block";
-        userInfo.style.display = "none";
+        ytPlayer.playVideo();
+      }
+    }
+
+    btnPlay.addEventListener("click", togglePlayPause);
+    fpBtnPlay.addEventListener("click", togglePlayPause);
+
+    function playNext(e) {
+      if (e) e.stopPropagation();
+      if (!currentPlaylist.length) return;
+      currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
+      loadSongData(currentSongIndex);
+    }
+
+    function playPrev(e) {
+      if (e) e.stopPropagation();
+      if (!currentPlaylist.length) return;
+      currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
+      loadSongData(currentSongIndex);
+    }
+
+    btnNext.addEventListener("click", playNext);
+    fpBtnNext.addEventListener("click", playNext);
+    btnPrev.addEventListener("click", playPrev);
+    fpBtnPrev.addEventListener("click", playPrev);
+
+    function loadSongData(index) {
+      if (!currentPlaylist[index]) return;
+      const song = currentPlaylist[index];
+
+      bpTitle.textContent = song.title;
+      bpArtist.textContent = song.author;
+      bpThumb.src = song.thumb;
+
+      fpSongTitle.textContent = song.title;
+      fpSongArtist.textContent = song.author;
+      posterArt.src = song.thumb;
+
+      updateFavIcon();
+      updateMediaSession(song);
+
+      if (ytReady && ytPlayer) {
+        ytPlayer.loadVideoById({ videoId: song.videoId, startSeconds: 0 });
+        ytPlayer.unMute();
+        isMuted = false;
+        muteBtn.textContent = "🔊";
+        keepAudioAlive(true);
+      }
+    }
+
+    // Audio / Video Modes
+    audioModeBtn.addEventListener("click", () => {
+      audioModeBtn.classList.add("active");
+      videoModeBtn.classList.remove("active");
+      screenBox.classList.remove("video-mode");
+    });
+
+    videoModeBtn.addEventListener("click", () => {
+      videoModeBtn.classList.add("active");
+      audioModeBtn.classList.remove("active");
+      screenBox.classList.add("video-mode");
+      if (ytReady && ytPlayer && !isPlaying) {
+        ytPlayer.playVideo();
       }
     });
 
+    muteBtn.addEventListener("click", () => {
+      if (!ytReady || !ytPlayer) return;
+      if (isMuted) {
+        ytPlayer.unMute();
+        isMuted = false;
+        muteBtn.textContent = "🔊";
+      } else {
+        ytPlayer.mute();
+        isMuted = true;
+        muteBtn.textContent = "🔇";
+      }
+    });
+
+    fullscreenBtn.addEventListener("click", async () => {
+      if (!ytReady || !ytPlayer) return;
+      const iframe = ytPlayer.getIframe();
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else if (iframe && iframe.requestFullscreen) {
+        await iframe.requestFullscreen();
+      }
+    });
+
+    // YouTube Search
     searchBtn.addEventListener("click", () => performSearch(searchInput.value));
     searchInput.addEventListener("keydown", e => {
       if (e.key === "Enter") performSearch(searchInput.value);
@@ -502,14 +512,14 @@
       query = query.trim();
       if (!query) return;
 
-      resultsList.innerHTML = '<p style="text-align:center;color:#ff0055;font-weight:800">Searching…</p>';
+      resultsList.innerHTML = '<p style="text-align:center;color:#ff0055;font-weight:800;margin:20px 0">Searching songs…</p>';
 
       const endpoint =
         "https://www.googleapis.com/youtube/v3/search" +
         "?part=snippet" +
         "&type=video" +
         "&videoEmbeddable=true" +
-        "&maxResults=15" +
+        "&maxResults=20" +
         "&q=" + encodeURIComponent(query) +
         "&key=" + encodeURIComponent(YOUTUBE_API_KEY);
 
@@ -518,7 +528,7 @@
         const data = await res.json();
 
         if (!res.ok || data.error) {
-          resultsList.innerHTML = '<p style="text-align:center;color:#ff667f">YouTube Search API error. Check API key.</p>';
+          resultsList.innerHTML = '<p style="text-align:center;color:#ff667f">YouTube Search error. Quota check karein.</p>';
           return;
         }
 
@@ -528,9 +538,7 @@
             videoId: item.id.videoId,
             title: decodeHtml(item.snippet.title),
             author: item.snippet.channelTitle,
-            thumb: item.snippet.thumbnails?.high?.url ||
-                   item.snippet.thumbnails?.medium?.url ||
-                   item.snippet.thumbnails?.default?.url
+            thumb: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url
           }));
 
         if (!items.length) {
@@ -539,7 +547,6 @@
         }
 
         currentPlaylist = items;
-        currentSongIndex = 0;
         renderList(items, false);
       } catch (err) {
         resultsList.innerHTML = '<p style="text-align:center;color:#ff667f">Network error.</p>';
@@ -553,14 +560,7 @@
     }
 
     function renderList(items, isFavList = false) {
-      currentPlaylist = items;
       resultsList.innerHTML = "";
-
-      if (!items.length) {
-        resultsList.innerHTML = '<p style="color:#888;text-align:center">List is empty.</p>';
-        return;
-      }
-
       items.forEach((song, index) => {
         const loved = favorites.some(x => x.videoId === song.videoId);
         const card = document.createElement("div");
@@ -569,24 +569,22 @@
         const img = document.createElement("img");
         img.src = song.thumb;
         img.alt = "Thumbnail";
-        img.loading = "lazy";
 
         const meta = document.createElement("div");
         meta.className = "song-meta";
-        meta.innerHTML = `<h4></h4><p></p>`;
-        meta.querySelector("h4").textContent = song.title;
-        meta.querySelector("p").textContent = song.author;
+        meta.innerHTML = `<h4>${song.title}</h4><p>${song.author}</p>`;
 
         const fav = document.createElement("button");
         fav.className = "fav-btn" + (loved ? " loved" : "");
         fav.textContent = loved ? "❤️" : "🤍";
-        fav.title = "Favorite";
 
         card.append(img, meta, fav);
 
         const select = () => {
+          currentPlaylist = items;
           currentSongIndex = index;
           loadSongData(index);
+          fullPlayer.classList.add("open"); // Song select karte hi full screen modal khulega
         };
 
         img.addEventListener("click", select);
@@ -594,158 +592,36 @@
 
         fav.addEventListener("click", e => {
           e.stopPropagation();
-          toggleFavorite(song, fav);
+          toggleFavorite(song);
+          fav.textContent = favorites.some(x => x.videoId === song.videoId) ? "❤️" : "🤍";
+          fav.classList.toggle("loved");
           if (isFavList) renderFavorites();
-        });
-
-        card.addEventListener("click", e => {
-          if (e.target !== fav && e.target !== img) select();
         });
 
         resultsList.appendChild(card);
       });
     }
 
-    function loadSongData(index) {
-      if (!currentPlaylist[index]) return;
-
-      const song = currentPlaylist[index];
-      bpTitle.textContent = song.title;
-      bpArtist.textContent = song.author;
-      bpThumb.src = song.thumb;
-      posterArt.src = song.thumb;
-      nowPlayingSmall.textContent = song.title;
-      screenMessage.classList.add("hidden");
-
-      // 🔴 Set Media Session Info for Lock Screen 🔴
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: song.title,
-          artist: song.author,
-          album: 'Prasoon Music',
-          artwork: [{ src: song.thumb, sizes: '512x512', type: 'image/jpeg' }]
-        });
-      }
-
-      if (!ytReady || !ytPlayer) {
-        pendingVideoId = song.videoId;
-        playerStatus.textContent = "Loading YouTube player…";
-        return;
-      }
-      playVideoId(song.videoId);
+    function updateFavIcon() {
+      if (!currentPlaylist[currentSongIndex]) return;
+      const song = currentPlaylist[currentSongIndex];
+      const isLoved = favorites.some(x => x.videoId === song.videoId);
+      fpFavBtn.textContent = isLoved ? "❤️" : "🤍";
     }
 
-    function playVideoId(videoId) {
-      if (!ytPlayer) return;
-      try {
-        ytPlayer.loadVideoById({ videoId, startSeconds: 0 });
-        ytPlayer.unMute();
-        isMuted = false;
-        muteBtn.textContent = "🔊";
-        ytPlayer.playVideo();
-        playerStatus.textContent = "Starting…";
-      } catch (err) {}
-    }
-
-    btnPlay.addEventListener("click", () => {
-      if (!ytReady || !ytPlayer) return;
-      if (!currentPlaylist.length) return;
-      if (!ytPlayer.getVideoData().video_id) {
-        loadSongData(currentSongIndex);
-        return;
-      }
-      try {
-        if (isPlaying) {
-          ytPlayer.pauseVideo();
-        } else {
-          ytPlayer.unMute();
-          isMuted = false;
-          muteBtn.textContent = "🔊";
-          ytPlayer.playVideo();
-        }
-      } catch (err) {}
+    fpFavBtn.addEventListener("click", () => {
+      if (!currentPlaylist[currentSongIndex]) return;
+      toggleFavorite(currentPlaylist[currentSongIndex]);
+      updateFavIcon();
+      if (tabFav.classList.contains("active")) renderFavorites();
     });
 
-    btnNext.addEventListener("click", playNext);
-    btnPrev.addEventListener("click", playPrev);
-
-    function playNext() {
-      if (!currentPlaylist.length) return;
-      currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
-      loadSongData(currentSongIndex);
-    }
-
-    function playPrev() {
-      if (!currentPlaylist.length) return;
-      currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
-      loadSongData(currentSongIndex);
-    }
-
-    audioModeBtn.addEventListener("click", () => {
-      audioModeBtn.classList.add("active");
-      videoModeBtn.classList.remove("active");
-      screenBox.classList.remove("video-mode");
-      savePlayerState();
-    });
-
-    videoModeBtn.addEventListener("click", () => {
-      videoModeBtn.classList.add("active");
-      audioModeBtn.classList.remove("active");
-      screenBox.classList.add("video-mode");
-      if (ytReady && ytPlayer && ytPlayer.getVideoData().video_id) {
-        ytPlayer.unMute();
-        isMuted = false;
-        muteBtn.textContent = "🔊";
-        if (!isPlaying) ytPlayer.playVideo();
-      }
-      savePlayerState();
-    });
-
-    muteBtn.addEventListener("click", () => {
-      if (!ytReady || !ytPlayer) return;
-      if (isMuted) {
-        ytPlayer.unMute();
-        isMuted = false;
-        muteBtn.textContent = "🔊";
-        if (volumeToggle.checked) localStorage.setItem("pm_muted", "0");
-        savePlayerState();
-      } else {
-        ytPlayer.mute();
-        isMuted = true;
-        muteBtn.textContent = "🔇";
-        if (volumeToggle.checked) localStorage.setItem("pm_muted", "1");
-        savePlayerState();
-      }
-    });
-
-    fullscreenBtn.addEventListener("click", async () => {
-      if (!ytReady || !ytPlayer) return;
-      const iframe = ytPlayer.getIframe();
-      try {
-        if (document.fullscreenElement) {
-          await document.exitFullscreen();
-          return;
-        }
-        if (iframe && iframe.requestFullscreen) {
-          await iframe.requestFullscreen();
-          return;
-        }
-        if (screenBox.requestFullscreen) {
-          await screenBox.requestFullscreen();
-        }
-      } catch (err) {}
-    });
-
-    function toggleFavorite(song, button) {
-      const index = favorites.findIndex(x => x.videoId === song.videoId);
-      if (index === -1) {
+    function toggleFavorite(song) {
+      const idx = favorites.findIndex(x => x.videoId === song.videoId);
+      if (idx === -1) {
         favorites.push(song);
-        button.classList.add("loved");
-        button.textContent = "❤️";
       } else {
-        favorites.splice(index, 1);
-        button.classList.remove("loved");
-        button.textContent = "🤍";
+        favorites.splice(idx, 1);
       }
       localStorage.setItem("myFavorites", JSON.stringify(favorites));
     }
@@ -753,11 +629,7 @@
     tabSearch.addEventListener("click", () => {
       tabSearch.classList.add("active");
       tabFav.classList.remove("active");
-      if (searchInput.value.trim()) {
-        performSearch(searchInput.value);
-      } else {
-        resultsList.innerHTML = '<p style="color:#666;text-align:center">Search for a song to begin.</p>';
-      }
+      if (searchInput.value.trim()) performSearch(searchInput.value);
     });
 
     tabFav.addEventListener("click", renderFavorites);
@@ -768,50 +640,54 @@
       renderList(favorites, true);
     }
 
-    // 🔴 FORCE APP INSTALL LOGIC 🔴
+    // Google Auth
+    loginBtn.addEventListener("click", async () => {
+      try { await signInWithPopup(auth, provider); } catch(e){}
+    });
+    logoutBtn.addEventListener("click", () => signOut(auth));
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        loginBtn.style.display = "none";
+        userInfo.style.display = "flex";
+        userImg.src = user.photoURL || "https://via.placeholder.com/40";
+      } else {
+        loginBtn.style.display = "block";
+        userInfo.style.display = "none";
+      }
+    });
+
+    // PWA Install Setup
+    const optionsFab = $("options-fab");
+    const optionsSheet = $("options-sheet");
+    const closeOptions = $("close-options");
+    const installBanner = $("pwa-install-btn");
+    const installNowBtn = $("install-now");
     let deferredPrompt = null;
-    
+
+    optionsFab.addEventListener("click", () => optionsSheet.classList.add("open"));
+    closeOptions.addEventListener("click", () => optionsSheet.classList.remove("open"));
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBanner.style.display = "block";
+    });
+
+    async function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt = null;
+        installBanner.style.display = "none";
+      }
+    }
+    installBanner.addEventListener("click", installPWA);
+    installNowBtn.addEventListener("click", installPWA);
+
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("./service-worker.js");
       });
     }
-
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-      installBtn.style.display = 'none';
-      installNowBtn.textContent = "✓ Installed";
-      installNowBtn.disabled = true;
-    }
-
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = "block";
-      installNowBtn.textContent = "📲 Install App";
-      installNowBtn.disabled = false;
-    });
-
-    async function handleInstallClick() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          installBtn.style.display = 'none';
-          installNowBtn.textContent = "✓ Installed";
-          installNowBtn.disabled = true;
-        }
-        deferredPrompt = null;
-      }
-    }
-
-    installBtn.addEventListener("click", handleInstallClick);
-    installNowBtn.addEventListener("click", handleInstallClick);
-
-    window.addEventListener("appinstalled", () => {
-      installBtn.style.display = "none";
-      installNowBtn.textContent = "✓ Installed";
-      installNowBtn.disabled = true;
-    });
   </script>
 </body>
 </html>
