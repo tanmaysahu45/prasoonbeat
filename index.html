@@ -352,9 +352,9 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        getEl('login-btn').style.display = "none";
-        getEl('user-info').style.display = "flex";
-        getEl('user-img').src = user.photoURL || "https://via.placeholder.com/30";
+        if (getEl('login-btn')) getEl('login-btn').style.display = "none";
+        if (getEl('user-info')) getEl('user-info').style.display = "flex";
+        if (getEl('user-img')) getEl('user-img').src = user.photoURL || "https://via.placeholder.com/30";
         
         const userRef = doc(db, "users", user.uid);
         
@@ -394,8 +394,8 @@
       } else {
         currentUser = null;
         if(unsubFavs) unsubFavs();
-        getEl('login-btn').style.display = "block";
-        getEl('user-info').style.display = "none";
+        if (getEl('login-btn')) getEl('login-btn').style.display = "block";
+        if (getEl('user-info')) getEl('user-info').style.display = "none";
       }
     });
 
@@ -531,14 +531,16 @@
         favorites.push(song);
       }
       
+      localStorage.setItem("pm_favs", JSON.stringify(favorites));
+      updateFavBtnUI();
+      if (getEl('tab-fav')?.classList.contains('active')) renderFavs();
+
       if (currentUser) {
         try {
           await setDoc(doc(db, "users", currentUser.uid), { favorites }, { merge: true });
-        } catch(e) { console.error(e); }
-      } else {
-        localStorage.setItem("pm_favs", JSON.stringify(favorites));
-        if (getEl('tab-fav').classList.contains('active')) renderFavs();
-        updateFavBtnUI();
+        } catch(e) {
+          console.warn('Cloud favorite sync failed; local favorite was saved.', e);
+        }
       }
     }
 
@@ -556,7 +558,10 @@
     addSafeEvent('mini-open', 'click', () => getEl('full-player').classList.add('open'));
     addSafeEvent('fp-close', 'click', () => getEl('full-player').classList.remove('open'));
     
-    addSafeEvent('fp-fav-btn', 'click', () => toggleFavorite(currentPlaylist[currentSongIndex]));
+    addSafeEvent('fp-fav-btn', 'click', () => {
+      const song = currentPlaylist[currentSongIndex];
+      if (song) toggleFavorite(song);
+    });
 
     // Mode Audio/Video toggles
     addSafeEvent('mode-audio', 'click', () => { 
@@ -588,9 +593,19 @@
       } 
     });
     
-    addSafeEvent('fs-btn', 'click', () => { 
-        const iframe = ytPlayer.getIframe(); 
-        if(iframe && iframe.requestFullscreen) iframe.requestFullscreen(); 
+    addSafeEvent('fs-btn', 'click', async () => {
+      try {
+        const iframe = ytPlayer && typeof ytPlayer.getIframe === 'function'
+          ? ytPlayer.getIframe() : null;
+        if (!iframe) {
+          getEl('player-status').innerText = 'Video player is not ready yet.';
+          return;
+        }
+        if (iframe.requestFullscreen) await iframe.requestFullscreen();
+        else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+      } catch (err) {
+        console.warn('Fullscreen unavailable:', err);
+      }
     });
 
     // 11. SEARCH YOUTUBE API LOGIC
@@ -633,44 +648,65 @@
 
     // 12. RENDER LISTS
     function renderList(items) {
-      const list = getEl('results-list'); 
+      const list = getEl('results-list');
+      if (!list) return;
       list.innerHTML = "";
-      
-      if(!items.length) { 
-          list.innerHTML = '<p style="text-align:center;color:var(--muted)">No results.</p>'; 
-          return; 
+
+      if (!Array.isArray(items) || !items.length) {
+        list.innerHTML = '<p style="text-align:center;color:var(--muted)">No results.</p>';
+        return;
       }
-      
+
       items.forEach((song, idx) => {
-        const isFav = favorites.some(f => f.videoId === song.videoId);
-        const card = document.createElement('div'); 
+        if (!song || !song.videoId) return;
+
+        const isFav = favorites.some(f => f && f.videoId === song.videoId);
+        const card = document.createElement('div');
         card.className = 'song-card';
-        card.innerHTML = `
-            <img src="${song.thumb}" alt="Cover">
-            <div class="song-info">
-                <h4>${song.title}</h4>
-                <p>${song.author}</p>
-            </div>
-            <button class="fav-btn ${isFav ? 'active' : ''}">${isFav ? '❤️' : '🤍'}</button>
-        `;
-        
-        // Clicks
-        card.querySelector('.song-info').onclick = () => { 
-            currentPlaylist = items; 
-            loadSong(idx); 
-            getEl('full-player').classList.add('open'); 
+
+        const img = document.createElement('img');
+        img.src = song.thumb || '';
+        img.alt = 'Cover';
+        img.loading = 'lazy';
+
+        const info = document.createElement('div');
+        info.className = 'song-info';
+
+        const title = document.createElement('h4');
+        title.textContent = song.title || 'Unknown song';
+
+        const artist = document.createElement('p');
+        artist.textContent = song.author || 'Unknown artist';
+
+        const btn = document.createElement('button');
+        btn.className = `fav-btn ${isFav ? 'active' : ''}`;
+        btn.type = 'button';
+        btn.textContent = isFav ? '❤️' : '🤍';
+        btn.setAttribute('aria-label', 'Like song');
+
+        info.append(title, artist);
+        card.append(img, info, btn);
+
+        const openSong = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          currentPlaylist = items.filter(Boolean);
+          loadSong(idx);
+          getEl('full-player')?.classList.add('open');
         };
-        card.querySelector('img').onclick = card.querySelector('.song-info').onclick;
-        
-        // Favorite
-        const btn = card.querySelector('.fav-btn');
-        btn.onclick = (e) => { 
-            e.stopPropagation(); 
-            toggleFavorite(song); 
-            btn.innerText = favorites.some(f => f.videoId === song.videoId) ? '❤️' : '🤍'; 
-            btn.classList.toggle('active'); 
-        };
-        
+
+        info.addEventListener('click', openSong);
+        img.addEventListener('click', openSong);
+
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          await toggleFavorite(song);
+          const liked = favorites.some(f => f && f.videoId === song.videoId);
+          btn.textContent = liked ? '❤️' : '🤍';
+          btn.classList.toggle('active', liked);
+        });
+
         list.appendChild(card);
       });
     }
@@ -763,6 +799,16 @@
     
     addSafeEvent('install-now', 'click', handleInstallClick);
     addSafeEvent('pwa-install-btn', 'click', handleInstallClick);
+
+    window.addEventListener('error', (event) => {
+      console.error('App error:', event.error || event.message);
+      const status = getEl('player-status');
+      if (status) status.innerText = 'Something went wrong. Please try again.';
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise error:', event.reason);
+    });
 
     // Register Service Worker
     if ('serviceWorker' in navigator) {
